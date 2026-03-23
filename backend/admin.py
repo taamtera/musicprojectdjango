@@ -1,22 +1,14 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Artist, Enjoyer, Song, Library, LibraryEntry, ShareLink
+from .models import User, Song, Library, LibraryEntry, ShareLink
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     list_display = ('username', 'email', 'name', 'is_staff')
-    fieldsets = UserAdmin.fieldsets + (
-        (None, {'fields': ('name',)}),
-    )
-
-@admin.register(Artist)
-class ArtistAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'name')
-
-@admin.register(Enjoyer)
-class EnjoyerAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'name')
     filter_horizontal = ('listens_to',)
+    fieldsets = UserAdmin.fieldsets + (
+        (None, {'fields': ('name', 'listens_to')}),
+    )
 
 @admin.register(Song)
 class SongAdmin(admin.ModelAdmin):

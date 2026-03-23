@@ -1,6 +1,6 @@
-# Chithara AI Music Generator - Domain Layer Implementation
+# Chithara AI Music Generator - Web Application
 
-This repository contains the Django domain layer implementation for the Chithara AI Music Generator (Exercise 3).
+This repository contains the fully built, consolidated web application for the Chithara AI Music Generator. It is cleanly separated into two distinct Django apps: `frontend` (managing templates, UI, and views) and `backend` (managing all database models and schemas).
 
 ## Project Setup
 
@@ -8,22 +8,24 @@ This repository contains the Django domain layer implementation for the Chithara
 - Python 3.10+
 - Django 5.2+
 
-### Running the Project Locally
-1. Clone or download the repository and navigate to the project root directory.
-2. (Optional but recommended) Create and activate a virtual environment:
+### Quickstart Guide
+1. Clone or download the repository and navigate to the root directory.
+2. (Optional but recommended) Create and activate a virtual Python environment:
    ```bash
    python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   # On Windows: venv\Scripts\activate
+   # On Mac/Linux: source venv/bin/activate
    ```
-3. Install Django (if not already installed):
+3. Install Django:
    ```bash
    pip install django
    ```
-4. Apply the database migrations to set up the SQLite database:
+4. Run the database migrations to build your SQLite environment locally (vital for the custom User model structure):
    ```bash
+   python manage.py makemigrations
    python manage.py migrate
    ```
-5. (Optional) Create a superuser to access the Django admin panel:
+5. Create an administrative superuser account (if you haven't used the automated injection script):
    ```bash
    python manage.py createsuperuser
    ```
@@ -31,18 +33,20 @@ This repository contains the Django domain layer implementation for the Chithara
    ```bash
    python manage.py runserver
    ```
-7. Open a web browser and navigate to `http://127.0.0.1:8000/admin/` to access the admin site. 
+7. Open a web browser:
+   - Base Application (CRUD Dashboard): `http://127.0.0.1:8000/`
+   - Django Admin Registry: `http://127.0.0.1:8000/admin/`
 
-## Domain Model Implementation
-The domain models have been implemented straight from the domain diagram provided:
-- **`User`**: Base user model extending `AbstractUser`. Includes custom string representations.
-- **`Artist` & `Enjoyer`**: Submodels of `User`, inheriting using Django's multi-table inheritance strategy acting as specialized User types.
-- **`Song`**: The main payload object. Tied to `Artist` (who generated it) through a one-to-many relation, and `Enjoyer` (who listens to it) through a many-to-many relation.
-- **`Library`**: Contains references linking a 1-to-1 generated library or a 1-to-1 shared library directly from the User.
-- **`LibraryEntry`**: Effectively a junction model spanning `Library` and `Song` containing its string `entry_type`.
-- **`ShareLink`**: Holds individual shares representing permissions, an extrinsic email, the linked track, and the user who originated the share.
+## Architecture Structure
 
-## CRUD Operations Setup
-Creation, Reading, Updating, and Deletion operations can all be manually performed right in the browser via the **Django Admin** interface.
-- Logging into `/admin` with your superuser credentials will permit adding new Users, generating Songs, and linking Libraries. 
-- You do not need to construct specific API endpoints or View templates for this assignment based on instructions.
+This project completely drops monolithic structures by separating logic into two core scalable systems:
+
+- **`backend`**: Houses all database modeling via an `api/models/` folder. Contains schemas for `user_model.py`, `song_model.py`, `library_model.py`, and `share_model.py`. The Django Admin interface is explicitly registered to expose all these nested attributes.
+- **`frontend`**: Manages the CRUD (Create, Read, Update, Delete) interfaces dynamically. Contains `views.py` handling form processing logic, `urls.py` managing all interaction routes, and `templates/frontend/` presenting the Tailwind-styled HTML views securely.
+
+## Core Models
+
+- **`User`**: Base profile extending the custom user matrix. Holds many-to-many relationship mappings to track a `listens_to` history. Replaces the older separate Artist/Enjoyer paradigms so anyone can act as a creator.
+- **`Song`**: The core data object tied directly to the `User` framework who generated it. 
+- **`Library` & `LibraryEntry`**: Holds discrete junction tracking connecting individual User libraries cleanly to specific tracks.
+- **`ShareLink`**: External links carrying specific user permissions for shared interactions.
