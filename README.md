@@ -10,28 +10,23 @@ This repository contains the Django domain layer implementation for the Chithara
 
 ### Running the Project Locally
 1. Clone or download the repository and navigate to the project root directory.
-2. (Optional but recommended) Create and activate a virtual environment:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-3. Install Django (if not already installed):
+2. Install Django (if not already installed):
    ```bash
    pip install django
    ```
-4. Apply the database migrations to set up the SQLite database:
+3. Apply the database migrations to set up the SQLite database:
    ```bash
    python manage.py migrate
    ```
-5. (Optional) Create a superuser to access the Django admin panel:
+4. (Optional) Create a superuser to access the Django admin panel:
    ```bash
    python manage.py createsuperuser
    ```
-6. Start the development server:
+5. Start the development server:
    ```bash
    python manage.py runserver
    ```
-7. Open a web browser and navigate to `http://127.0.0.1:8000/admin/` to access the admin site. 
+6. Open a web browser and navigate to `http://127.0.0.1:8000/admin/` to access the admin site. 
 
 ## Domain Model Implementation
 The domain models have been implemented straight from the domain diagram provided:
