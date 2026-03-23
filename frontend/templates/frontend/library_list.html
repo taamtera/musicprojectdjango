@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Libraries | Music Project{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-8">
+    <h2 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">Libraries Directory</h2>
+    <a href="{% url 'library-create' %}" class="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white font-medium shadow-lg transition-transform hover:scale-105">
+        + Create Library
+    </a>
+</div>
+
+<div class="glass-panel overflow-hidden">
+    <table class="w-full text-left border-collapse">
+        <thead>
+            <tr class="bg-slate-800/50 border-b border-slate-700/50">
+                <th class="p-4 font-semibold text-slate-300">ID</th>
+                <th class="p-4 font-semibold text-slate-300">Generated User</th>
+                <th class="p-4 font-semibold text-slate-300">Shared User</th>
+                <th class="p-4 font-semibold text-slate-300 text-right">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for library in object_list %}
+            <tr class="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
+                <td class="p-4 font-medium">{{ library.id }}</td>
+                <td class="p-4 text-slate-400">{{ library.user_generated|default:"-" }}</td>
+                <td class="p-4 text-slate-400">{{ library.user_shared|default:"-" }}</td>
+                <td class="p-4 text-right space-x-2">
+                    <a href="{% url 'library-update' library.pk %}" class="text-blue-400 hover:text-blue-300 transition-colors">Edit</a>
+                    <a href="{% url 'library-delete' library.pk %}" class="text-red-400 hover:text-red-300 transition-colors">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="p-8 text-center text-slate-500">No libraries found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

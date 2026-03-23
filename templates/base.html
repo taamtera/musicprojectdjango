@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Music Project{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Navbar -->
+    <nav class="glass-panel sticky top-0 z-50 m-4 px-6 py-4 flex items-center justify-between">
+        <a href="{% url 'index' %}" class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
+            MusicDomain
+        </a>
+        <div class="space-x-4">
+            <a href="{% url 'song-list' %}" class="hover:text-purple-400 transition-colors">Songs</a>
+            <a href="{% url 'library-list' %}" class="hover:text-purple-400 transition-colors">Libraries</a>
+            <a href="{% url 'libraryentry-list' %}" class="hover:text-purple-400 transition-colors">Library Entries</a>
+            <a href="{% url 'sharelink-list' %}" class="hover:text-purple-400 transition-colors">Shares</a>
+            <a href="{% url 'user-list' %}" class="hover:text-purple-400 transition-colors">Users</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto py-6 text-center text-slate-400 glass-panel m-4">
+        <p>&copy; 2026 Music Project CRUD Dashboard</p>
+    </footer>
+</body>
+</html>

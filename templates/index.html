@@ -1,0 +1,36 @@
+{% extends "music_domain/base.html" %}
+
+{% block title %}Dashboard | Music Project{% endblock %}
+
+{% block content %}
+<div class="text-center mb-12">
+    <h1 class="text-5xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">
+        Entities Dashboard
+    </h1>
+    <p class="text-slate-300 text-lg">Manage your entire domain through functional MVT CRUD operations.</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Cards for each group -->
+    <a href="{% url 'song-list' %}" class="glass-panel p-6 hover:scale-105 transition-transform cursor-pointer group">
+        <h2 class="text-2xl font-bold text-white mb-2 group-hover:text-purple-400 transition-colors">Songs Management</h2>
+        <p class="text-slate-400">Create, Update, Delete, and Read generated songs.</p>
+    </a>
+    <a href="{% url 'library-list' %}" class="glass-panel p-6 hover:scale-105 transition-transform cursor-pointer group">
+        <h2 class="text-2xl font-bold text-white mb-2 group-hover:text-purple-400 transition-colors">Library Management</h2>
+        <p class="text-slate-400">Manage user collections and lists of songs (Libraries).</p>
+    </a>
+    <a href="{% url 'libraryentry-list' %}" class="glass-panel p-6 hover:scale-105 transition-transform cursor-pointer group">
+        <h2 class="text-2xl font-bold text-white mb-2 group-hover:text-purple-400 transition-colors">Library Entries</h2>
+        <p class="text-slate-400">Manage individual songs inside libraries.</p>
+    </a>
+    <a href="{% url 'sharelink-list' %}" class="glass-panel p-6 hover:scale-105 transition-transform cursor-pointer group">
+        <h2 class="text-2xl font-bold text-white mb-2 group-hover:text-purple-400 transition-colors">Sharing Manager</h2>
+        <p class="text-slate-400">Manage ShareLinks and their permissions.</p>
+    </a>
+    <a href="{% url 'user-list' %}" class="glass-panel p-6 hover:scale-105 transition-transform cursor-pointer group">
+        <h2 class="text-2xl font-bold text-white mb-2 group-hover:text-purple-400 transition-colors">User Manager</h2>
+        <p class="text-slate-400">View and manage platform Users.</p>
+    </a>
+</div>
+{% endblock %}

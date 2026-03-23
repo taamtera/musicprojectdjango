@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Share Links | Music Project{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-8">
+    <h2 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">Share Links Directory</h2>
+    <a href="{% url 'sharelink-create' %}" class="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white font-medium shadow-lg transition-transform hover:scale-105">
+        + Create Share Link
+    </a>
+</div>
+
+<div class="glass-panel overflow-hidden">
+    <table class="w-full text-left border-collapse">
+        <thead>
+            <tr class="bg-slate-800/50 border-b border-slate-700/50">
+                <th class="p-4 font-semibold text-slate-300">Song</th>
+                <th class="p-4 font-semibold text-slate-300">Creator</th>
+                <th class="p-4 font-semibold text-slate-300">Recipient Email</th>
+                <th class="p-4 font-semibold text-slate-300">Permissions</th>
+                <th class="p-4 font-semibold text-slate-300 text-right">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for link in object_list %}
+            <tr class="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
+                <td class="p-4 font-medium">{{ link.song.title }}</td>
+                <td class="p-4 text-slate-400">{{ link.creator.username }}</td>
+                <td class="p-4 text-slate-400">{{ link.email }}</td>
+                <td class="p-4 text-slate-400"><span class="px-2 py-1 rounded-full text-xs bg-pink-900/50 text-pink-300 border border-pink-700/50">{{ link.perm }}</span></td>
+                <td class="p-4 text-right space-x-2">
+                    <a href="{% url 'sharelink-update' link.pk %}" class="text-blue-400 hover:text-blue-300 transition-colors">Edit</a>
+                    <a href="{% url 'sharelink-delete' link.pk %}" class="text-red-400 hover:text-red-300 transition-colors">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="p-8 text-center text-slate-500">No share links found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
