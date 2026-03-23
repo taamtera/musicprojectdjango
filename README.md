@@ -34,8 +34,7 @@ This repository contains the fully built, consolidated web application for the C
    python manage.py runserver
    ```
 7. Open a web browser:
-   - Base Application (CRUD Dashboard): `http://127.0.0.1:8000/`
-   - Django Admin Registry: `http://127.0.0.1:8000/admin/`
+   - Django Admin Registry (only adming implimented as of now): `http://127.0.0.1:8000/admin/`
 
 ## Architecture Structure
 
@@ -50,3 +49,11 @@ This project completely drops monolithic structures by separating logic into two
 - **`Song`**: The core data object tied directly to the `User` framework who generated it. 
 - **`Library` & `LibraryEntry`**: Holds discrete junction tracking connecting individual User libraries cleanly to specific tracks.
 - **`ShareLink`**: External links carrying specific user permissions for shared interactions.
+
+## CRUD Operations
+
+
+![CREATE](images/img1.png)
+![READ](images/img2.png)
+![UPDATE](images/img3.png)
+![DELETE](images/img4.png)
