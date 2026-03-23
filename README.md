@@ -52,8 +52,14 @@ This project completely drops monolithic structures by separating logic into two
 
 ## CRUD Operations
 
-
+CREATE
 ![CREATE](images/img1.png)
+
+READ
 ![READ](images/img2.png)
+
+UPDATE
 ![UPDATE](images/img3.png)
+
+DELETE
 ![DELETE](images/img4.png)
