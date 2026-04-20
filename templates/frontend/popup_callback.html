@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Logging in...</title>
+</head>
+<body>
+    <p>Authentication successful. You can close this window.</p>
+    <script>
+        if (window.opener && !window.opener.closed) {
+            var urlParams = new URLSearchParams(window.location.search);
+            var target = urlParams.get('target');
+            if (target) {
+                window.opener.location.href = target;
+            } else {
+                window.opener.location.reload();
+            }
+            window.close();
+        } else {
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>

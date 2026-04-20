@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Song, Library, LibraryEntry, ShareLink
+from .models import User, Song, ShareLink
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
@@ -12,20 +12,11 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(Song)
 class SongAdmin(admin.ModelAdmin):
-    list_display = ('title', 'genre', 'gen_status', 'generated_by')
-    list_filter = ('genre', 'gen_status')
+    list_display = ('title', 'genre', 'gen_status', 'generated_by', 'created_at')
+    list_filter = ('genre', 'gen_status', 'created_at')
     search_fields = ('title', 'description')
-
-@admin.register(Library)
-class LibraryAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user_generated', 'user_shared')
-
-@admin.register(LibraryEntry)
-class LibraryEntryAdmin(admin.ModelAdmin):
-    list_display = ('library', 'song', 'entry_type')
-    list_filter = ('entry_type',)
 
 @admin.register(ShareLink)
 class ShareLinkAdmin(admin.ModelAdmin):
-    list_display = ('song', 'creator', 'email', 'perm')
-    list_filter = ('perm',)
+    list_display = ('song', 'creator', 'email', 'can_view', 'can_download', 'can_share_forward')
+    list_filter = ('can_view', 'can_download', 'can_share_forward')

@@ -1,18 +1,23 @@
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from backend.models import User, Song, Library, LibraryEntry, ShareLink
+from django.contrib.auth.mixins import LoginRequiredMixin
+from backend.models import User, Song, ShareLink
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 
 # Index view
 def index(request):
-    return render(request, 'frontend/index.html')
+    return render(request, 'index.html')
+
+def popup_callback(request):
+    return render(request, 'frontend/popup_callback.html')
 
 # User Views
-class UserListView(ListView):
+class UserListView(LoginRequiredMixin, ListView):
     model = User
     template_name = 'frontend/user_list.html'
 
-class UserCreateView(CreateView):
+class UserCreateView(LoginRequiredMixin, CreateView):
     model = User
     fields = ['username', 'email', 'name', 'is_staff']
     template_name = 'generic_form.html'
@@ -23,7 +28,7 @@ class UserCreateView(CreateView):
         context['title'] = 'Create User'
         return context
 
-class UserUpdateView(UpdateView):
+class UserUpdateView(LoginRequiredMixin, UpdateView):
     model = User
     fields = ['username', 'email', 'name', 'is_staff']
     template_name = 'generic_form.html'
@@ -34,19 +39,32 @@ class UserUpdateView(UpdateView):
         context['title'] = 'Update User'
         return context
 
-class UserDeleteView(DeleteView):
+class UserDeleteView(LoginRequiredMixin, DeleteView):
     model = User
     template_name = 'generic_confirm_delete.html'
     success_url = reverse_lazy('user-list')
 
 # Song Views
-class SongListView(ListView):
+class SongListView(LoginRequiredMixin, ListView):
     model = Song
     template_name = 'frontend/song_list.html'
 
-class SongCreateView(CreateView):
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        sort_by = self.request.GET.get('sort', '-created_at')
+        genre_filter = self.request.GET.get('genre', '')
+        
+        if genre_filter:
+            queryset = queryset.filter(genre__icontains=genre_filter)
+            
+        if sort_by in ['title', '-title', 'created_at', '-created_at']:
+            queryset = queryset.order_by(sort_by)
+            
+        return queryset
+
+class SongCreateView(LoginRequiredMixin, CreateView):
     model = Song
-    fields = ['title', 'genre', 'description', 'gen_status', 'generated_by']
+    fields = ['title', 'genre', 'tags', 'description', 'gen_status', 'generated_by', 'audio_url']
     template_name = 'generic_form.html'
     success_url = reverse_lazy('song-list')
 
@@ -55,9 +73,9 @@ class SongCreateView(CreateView):
         context['title'] = 'Create Song'
         return context
 
-class SongUpdateView(UpdateView):
+class SongUpdateView(LoginRequiredMixin, UpdateView):
     model = Song
-    fields = ['title', 'genre', 'description', 'gen_status', 'generated_by']
+    fields = ['title', 'genre', 'tags', 'description', 'gen_status', 'generated_by', 'audio_url']
     template_name = 'generic_form.html'
     success_url = reverse_lazy('song-list')
 
@@ -66,83 +84,19 @@ class SongUpdateView(UpdateView):
         context['title'] = 'Update Song'
         return context
 
-class SongDeleteView(DeleteView):
+class SongDeleteView(LoginRequiredMixin, DeleteView):
     model = Song
     template_name = 'generic_confirm_delete.html'
     success_url = reverse_lazy('song-list')
 
-# Library Views
-class LibraryListView(ListView):
-    model = Library
-    template_name = 'frontend/library_list.html'
-
-class LibraryCreateView(CreateView):
-    model = Library
-    fields = ['user_generated', 'user_shared']
-    template_name = 'generic_form.html'
-    success_url = reverse_lazy('library-list')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Create Library'
-        return context
-
-class LibraryUpdateView(UpdateView):
-    model = Library
-    fields = ['user_generated', 'user_shared']
-    template_name = 'generic_form.html'
-    success_url = reverse_lazy('library-list')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Update Library'
-        return context
-
-class LibraryDeleteView(DeleteView):
-    model = Library
-    template_name = 'generic_confirm_delete.html'
-    success_url = reverse_lazy('library-list')
-
-# LibraryEntry Views
-class LibraryEntryListView(ListView):
-    model = LibraryEntry
-    template_name = 'frontend/libraryentry_list.html'
-
-class LibraryEntryCreateView(CreateView):
-    model = LibraryEntry
-    fields = ['library', 'song', 'entry_type']
-    template_name = 'generic_form.html'
-    success_url = reverse_lazy('libraryentry-list')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Create Library Entry'
-        return context
-
-class LibraryEntryUpdateView(UpdateView):
-    model = LibraryEntry
-    fields = ['library', 'song', 'entry_type']
-    template_name = 'generic_form.html'
-    success_url = reverse_lazy('libraryentry-list')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Update Library Entry'
-        return context
-
-class LibraryEntryDeleteView(DeleteView):
-    model = LibraryEntry
-    template_name = 'generic_confirm_delete.html'
-    success_url = reverse_lazy('libraryentry-list')
-
 # ShareLink Views
-class ShareLinkListView(ListView):
+class ShareLinkListView(LoginRequiredMixin, ListView):
     model = ShareLink
     template_name = 'frontend/sharelink_list.html'
 
-class ShareLinkCreateView(CreateView):
+class ShareLinkCreateView(LoginRequiredMixin, CreateView):
     model = ShareLink
-    fields = ['song', 'creator', 'email', 'perm']
+    fields = ['song', 'creator', 'email', 'can_view', 'can_download', 'can_share_forward']
     template_name = 'generic_form.html'
     success_url = reverse_lazy('sharelink-list')
 
@@ -151,9 +105,9 @@ class ShareLinkCreateView(CreateView):
         context['title'] = 'Create Share Link'
         return context
 
-class ShareLinkUpdateView(UpdateView):
+class ShareLinkUpdateView(LoginRequiredMixin, UpdateView):
     model = ShareLink
-    fields = ['song', 'creator', 'email', 'perm']
+    fields = ['song', 'creator', 'email', 'can_view', 'can_download', 'can_share_forward']
     template_name = 'generic_form.html'
     success_url = reverse_lazy('sharelink-list')
 
@@ -162,7 +116,7 @@ class ShareLinkUpdateView(UpdateView):
         context['title'] = 'Update Share Link'
         return context
 
-class ShareLinkDeleteView(DeleteView):
+class ShareLinkDeleteView(LoginRequiredMixin, DeleteView):
     model = ShareLink
     template_name = 'generic_confirm_delete.html'
     success_url = reverse_lazy('sharelink-list')
