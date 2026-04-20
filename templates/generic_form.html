@@ -6,7 +6,7 @@
 <div class="max-w-2xl mx-auto glass-panel p-8 mt-12">
     <h2 class="text-3xl font-bold mb-8 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500">{{ title }}</h2>
     
-    <form method="post" class="space-y-6">
+    <form method="post" class="space-y-6" id="mainForm" onsubmit="showProgress()">
         {% csrf_token %}
         
         {% for field in form %}
@@ -32,6 +32,70 @@
         </div>
     </form>
 </div>
+
+<!-- Progress Overlay (Hidden by default) -->
+<div id="progressOverlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden flex-col items-center justify-center">
+    <div class="glass-panel p-8 rounded-2xl max-w-md w-full text-center border border-purple-500/30">
+        <h3 class="text-2xl font-bold text-white mb-2" id="progressTitle">Generating Your AI Track</h3>
+        <p class="text-slate-400 mb-6 text-sm">Please wait while our models compose your music...</p>
+        
+        <div class="w-full bg-slate-800 rounded-full h-3 mb-4 overflow-hidden border border-slate-700">
+            <div id="progressBar" class="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+        
+        <div class="flex justify-between text-xs font-mono text-purple-300">
+            <span id="progressText">Initializing...</span>
+            <span id="progressPercent">0%</span>
+        </div>
+        
+        <!-- Animated visualizer bars -->
+        <div class="flex justify-center items-end h-12 mt-6 space-x-1 opacity-70">
+            <div class="w-2 bg-blue-400 rounded-t-sm animate-pulse h-4" style="animation-delay: 0.1s"></div>
+            <div class="w-2 bg-purple-400 rounded-t-sm animate-pulse h-8" style="animation-delay: 0.2s"></div>
+            <div class="w-2 bg-pink-400 rounded-t-sm animate-pulse h-6" style="animation-delay: 0.3s"></div>
+            <div class="w-2 bg-purple-400 rounded-t-sm animate-pulse h-10" style="animation-delay: 0.4s"></div>
+            <div class="w-2 bg-blue-400 rounded-t-sm animate-pulse h-5" style="animation-delay: 0.5s"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showProgress() {
+    const isCreateSong = document.querySelector('h2').innerText.includes('Create Song');
+    if (!isCreateSong) return true; // Only show for song creation
+    
+    document.getElementById('progressOverlay').classList.remove('hidden');
+    document.getElementById('progressOverlay').classList.add('flex');
+    
+    const bar = document.getElementById('progressBar');
+    const pct = document.getElementById('progressPercent');
+    const txt = document.getElementById('progressText');
+    
+    const steps = [
+        "Analyzing prompt semantics...",
+        "Generating melody matrix...",
+        "Synthesizing audio stems...",
+        "Applying post-processing effects...",
+        "Finalizing mixdown..."
+    ];
+    
+    let progress = 0;
+    const interval = setInterval(() => {
+        progress += Math.random() * 5;
+        if (progress > 95) progress = 95; // Wait for server at 95%
+        
+        bar.style.width = progress + '%';
+        pct.innerText = Math.floor(progress) + '%';
+        
+        const stepIdx = Math.min(Math.floor(progress / 20), 4);
+        txt.innerText = steps[stepIdx];
+        
+    }, 300);
+    
+    // We still submit the form natively to Django
+    return true;
+}
+</script>
 <style>
     /* Add basic styling to django form fields */
     input[type="text"], input[type="email"], input[type="number"], select, textarea {

@@ -1,0 +1,334 @@
+Software Requirement Specification
+For
+Chithara AI Music Generator
+Contractor:
+Taam Paramee
+Company, Project Manager
++66909092200, company@email.com
+Client:
+Timmy
+Principle of Software Design
+09th February 2026
+Table of Contents
+Introduction
+Overall Description
+Product Perspective
+User classes and characteristics
+Dependencies
+Out of Scope Requirements
+Assumptions
+Stakeholders
+User Stories
+System Features
+Use Case Model Diagram
+Use Case Model Descriptions
+Functional Requirement
+Non-Functional Requirements
+Mockups
+Glossary
+Appendicies
+Licensing
+3rd Party Integrations and References
+2
+2
+2
+2
+3 
+3
+3
+4
+5
+6
+8
+9
+18
+20
+22
+22
+23
+23
+24
+Introduction
+Document Overview
+Purpose: This document is a high-level Specification In compliance with IEEE 830* standard.
+Scope:This (SRS) document defines the purpose, scope, target audience,  FR*, NRF* and use cases of the Music Generation AI Application.It covers user authentication, AI-based music generation, music playback, downloading and sharing process. This document also specifies interactions with external services such as Google Authentication and SUNO AI music generation systems.
+This document does not describe system implementation details, the specific technologies used, AI model and AI processes. Specific hardware and deployment requirements for the system.
+Intended audience: This Document is intended for stakeholders including the client, investors, developers, testers, and maintainers.
+Overall Product Description
+Product Perspective (Product Purpose)
+The application being developed, Chithara AI Music, is an AI-powered, web-based platform designed to enable users to generate original music based on their personal preferences. The application allows users to create and share music through AI-driven generation tools, discover music from other creators, listen to or download songs from the platform, and create playlists to share with friends.
+Research conducted by the marketing department confirms that the trend of AI music generation applications is on the rise (Appendix A*). Users are increasingly interested in creating their own music, which has led us to refine the concept, reduce complexity, and aim to deliver a minimalist and frictionless user experience.
+User classes and characteristics
+There are two main types of users: Artists and Based Song Enjoyers*. For Artists who want to create music, the primary user flow focuses on song generation and sharing. For Based Song Enjoyers*. The main interactions involve listening to songs shared with them, sharing songs with other users, and/or creating their own playlists from multiple artists’ songs.
+Dependencies (specified by the client)
+Infrastructure(Hardware): Server or computer hosting infrastructure able to support docker containers and an active internet connection with reasonable performance to not impact the client specified ~100 average users.
+Deployment and Maintenance: Hosting and Production Deployment will be done by the client. Technical documentation will be provided upon project completion for the maintenance team. For technical queries contact support at taam.p@ku.th (support email)
+3rd Party: 
+Google OAuth systemSUNO Music generation API and account
+Users will have a device (desktop) connected to the internet, capable of running a browser (Chrome, Safari, Opera etc.) and have javascript enabled. For downloading options the permission for downloading files will have to be enabled.
+Out of Scope (specified by the client)
+There will be no AI generated content moderation.
+There is no administration or management capabilities in the system 
+Song Playlist Rating and Song Rating system.
+Song cover picture customization
+Access by unauthenticated users (will be redirected to login/signup page)
+Customization of the song after generation (name, image, description)
+Playlist/Album functionality
+Mobile support *in this case app will scale with screen size but accessibility on mobile is not guaranteed*
+Assumptions (Not specified by the client)
+User profile name and picture will be based of their google account logged in
+Users will not generate more than 10 songs per day (issue: free tier api limitations).
+Standard User Environment (SUE): A device capable of running the latest stable version of Google Chrome with support for common web applications, including audio streaming and real-time user interaction is required.
+Music storage medium is stored with *Suno AI’s server. The system stores the song as url, this could be subject to change
+Stakeholders
+Artists (End Users – Creators): Individuals who use the platform to create and produce songs.
+Based Song Enjoyer*(End Users – Listeners & Sharers): Users who engage with the platform to discover, listen to, and share songs.
+Client / Product Owner – Timmy: The commissioning client responsible for defining the product vision, business requirements, and overall direction of the software.
+Investors: Key stakeholders providing financial support and holding an interest in the project’s strategic success and return on investment.
+Developer: The party responsible for the design, development, testing, and technical maintenance of the software solution.
+Third-Party Service Provider – Google (OAuth Authentication): External service provider responsible for user authentication via OAuth login integration.
+Music Generation API Provider – SUNO: External API provider supplying the music generation capabilities integrated within the platform.
+User  Stories
+US1. As a User, I want to log in using a Google account so that I can quickly and securely access my songs from anywhere.
+US2. As a User, I want to log out so that I can secure my account from other users.
+US3. As an Artist, I want to generate songs using AI so that I can let my creativity flow.
+US4. As an Artist, I want to listen to my generated songs so that I can review my music.
+US5. As an Artist, I want to download my generated songs so that I can listen to my music offline.
+US6. As an Artist, I want to view all my generated songs so that I can easily keep track of my music.
+US7. As an Artist, I want to sort and filter my songs so that I can efficiently locate specific songs.
+US8. As an Artist, I want to share my songs so that my friends can access and listen to my music.
+US9. As an Artist, I want to set sharing permissions so that my songs are not publicly exposed.
+US10. As an Artist, I want to revoke access to shared songs so that only the specific people I choose can listen to them.
+US11. As an Artist, I want to delete songs so that I can remove unwanted or outdated content.
+US12. As a Based Song Enjoyer, I want to open a shared link to listen to my friend’s song.
+US13. As a Based Song Enjoyer, I want to download shared songs so that I can listen to the music offline.
+US14. As a Based Song Enjoyer, I want to view all songs shared with me so that I can access them without searching for each link.
+US15. As a Based Song Enjoyer, I want to remove shared songs so that I can remove songs I do not like.
+US16. As a User, I want the system to support many users at the same time so that the service does not crash during peak usage.
+US17. As a User, I want the system to have at least 90% uptime so that I do not lose access to music.
+US18. As a User, I want the system to show progress while generating a song so that I know the process is still running.
+System Features
+SF1. User Authentication: The system allows users to log in using Google authentication and to securely log out to protect account access.Add:
+NFR Security: Ensure users can only manage their own songs and playlists. (access control applies after login too)
+ (Related User Stories: US1, US2)
+SF2. AI Music Creation: The system allows users to generate original songs using name, tags, and description as input parameters through AI technology. The system displays generation progress during the music creation process.
+NFR Security: The inputs for song generation shall be validated and sanitized to comply with Suno AI’s API* TOS*. 
+NFR Performance: The system supports multiple users (2 concurrent song  generations)
+NFR Usability: The system displays progress while a song is being generated so users know the process is ongoing.
+ (Related User Stories: US3, US16, US18)
+SF3. Music Library: The system allows users to view and delete generated songs. The system also provides sorting by generated date and time or song name, as well as filtering by tags and genre.
+(Related User Stories: US6, US7, US11)
+SF4. Song Features: The system provides in-app music playback, including play, pause, volume control, and next and previous song buttons. The system also provides options to share and download songs.
+(Related User Stories: US4, US5, US8)
+F5. Download and Sharing: The system allows users to share songs and playlists via links and to access music shared by other users. Using email-based access to set permissions such as view and/or download. With additional “share forward” option to enable the recipient to forward the song to other users
+NFR  Availability/Reliability: Shared songs are reliably retrievable. 
+(Related User Stories: US8, US12, US13, US17)
+F6. Sharing Management: The system allows users to manage sharing permissions for their songs, including revoking access and controlling whether songs are private or shared.
+(Related User Stories: US9, US10)
+F7. Shared Content Management: The system allows users to view all songs shared with them and remove shared songs from their shared content list.
+(Related User Stories: US14, US15)
+Use Case Model Diagram
+Use Case Model
+UC1: Generate and Listen to AI Song (Fully Dressed)
+Primary Actor: Artist Supporting Actors:
+AI Music Generation API (SUNO)
+Goal: Allow an artist to generate an AI song and listen to the generated result within the application.
+Scope: Music Generation AI ApplicationLevel: User goalTrigger:The artist selects the Generate AI Song option.
+Preconditions
+The artist is logged in to the application.
+The AI music generation service is available.
+Main Success Scenario
+The system displays the song generation input form (name, tags, description).
+The artist enters the song title.
+The artist enters the song genre
+The artist enters the song description.
+The artist submits the generation request.
+The system validates the inputs.
+The system sends the request to the AI music generation service.
+The system displays song generation progress to the artist.
+The AI service generates the song and returns the song as url/audio.
+The system stores the generated song in the artist’s library.
+The user selects the song generated to play.
+The system displays the song name, genre and description then starts playing the song.
+The artist listens to the generated song using playback controls.
+Extensions
+E1: Invalid input provided
+The system highlights invalid fields and requests correction.
+E2: AI generation fails or times out
+The system displays an error message after 1 minute and the progress bar stops
+E3: Download generated song
+The artist selects Download the song after the song is generated
+The system provides the song file.
+E4: Delete generated song
+The artist deletes the song
+The system removes it from the library.
+E5: Share generated song
+The artist proceeds to UC2 Share and Listen to Shared Song.
+Postconditions
+Success: A generated song exists and is playable by the artist.
+Failure: No song is generated or stored.
+Related User Stories:, US3, US4, US5, US6
+UC2: Share Song, Accept Share, and Listen (Fully Dressed)
+Primary Actor:
+Artist (sharing)
+Recipent (Based Song Enjoyer)
+Supporting Actors:
+Storage Service
+Goal: Allow an artist to share a song and allow another user to accept the share and listen to the song.
+Scope: Music Generation AI Application Level: User goalTrigger:The artist selects the Generate AI Song option.
+Preconditions
+The artist is logged in and owns the song.
+The Recipent has access to the application.
+The song exists in the artist’s library.
+Main Success Scenario
+The artist Click Share selects a song from their library.
+The system generates a share link for the selected song.
+The artist sets the email address able to limit access the song
+The artist adds the recipient email address.
+The artist sets sharing permissions  view only, download).
+The artist sets share forwarding permissions (enable the recipient to share the song)
+The system stores and enforces the sharing permissions.
+The artist shares the link with another user.
+The recipient opens the shared link.
+The system validates access permissions.
+The system displays the shared song player.
+The based song enjoyer listens to the shared song.
+Extensions
+E1: Enable Public Share
+The artist Selects Email instead of Public
+The artist inputs email of the recipient
+The Song
+E2: Disable Download Option
+The artist Disable Download Option for the shared link
+The Recipient now is not Permitted to download the song.
+E2: Disable Share Forward Option
+The artist Disable Share Forward Option for the shared link.
+The Recipient is now not Permitted to continue sharing this song to other users by adding .
+E3: Remove Specific User from  shared song
+The user removes the email of the recipient.
+The system removes access from that user.
+E4: Revoke sharing permissions
+The artist revokes their shared links.
+The system blocks access to that link from other users.
+E5: The Link does not get sent by the artist
+The artist shares the song but doesn’t forward the link to the Recipient.
+The song will automatically appear in the “Share to me” library.
+Postconditions
+Success: The shared song is accessible and playable by authorized users.
+Failure: The shared song is not accessible to unauthorized users.
+Related User Stories:, US7, US8, US9, US10, US11, US12, US13
+UC3: Login (Brief)
+Primary Actor: Artist, Based Song Enjoyer Goal: Log in using Google OAuth to access the system. Preconditions: User is not logged in. Trigger: User selects Login. Main Flow:
+The System redirects the user to Google OAuth.
+User authenticates with Google.
+The System creates a session and redirects the user to the application. Postconditions: User is logged in. Related User Stories: US1
+UC4: Logout (Brief)
+Primary Actor: Artist, Based Song Enjoyer Goal: Log out to protect account access. Preconditions: User is logged in. Trigger: User selects Logout. Main Flow:
+System ends the user session.
+The System redirects the user to the login page/home page.
+Postconditions: User is logged out. Related User Stories: US2
+UC5: View Generated Songs Library (Casual)
+Primary Actor: Artist Goal: View all generated songs in one place. Preconditions: Artist is logged in. Trigger: Artist opens Generated Songs Library. Main Flow: User opens library → system lists generated songs → user selects a song (may proceed to UC-01 for playback).
+ Postconditions: None. Related User Stories: US6
+UC6: Sort/Filter Songs (Brief)
+Primary Actor: Artist, Based Song Enjoyer Goal: Locate songs efficiently by sorting/filtering. Preconditions: User is viewing a song list (generated library or shared library). Trigger: User selects sort/filter options. Main Flow:
+The User chooses sort (name/date) and/or filters (tags/genre).
+The System updates the displayed list accordingly.
+ Postconditions: The song list is re-ordered/filtered. Related User Stories: US7
+UC7: Download Generated Song (Brief)
+Primary Actor: Artist Goal: Download a generated song for offline listening. Preconditions: Artist is logged in and the song exists. Trigger: Artist selects Download on a generated song. Main Flow:
+The System checks if the user owns the song.
+The System provides the downloadable file.
+ Postconditions: Song is downloaded. Related User Stories: US5
+UC8: Delete Generated Song (Brief)
+Primary Actor: Artist Goal: Remove unwanted/outdated generated songs. Preconditions: Artist is logged in and the song exists in their library. Trigger: Artist selects Delete. Main Flow:
+The system prompts confirmation.
+The Artist confirms deletion.
+The system deletes the song from the library.
+ Postconditions: Song is removed. Related User Stories: US11
+UC9: View Shared Songs Library (Casual)
+Primary Actor: Based Song Enjoyer Goal: View all songs shared with the user. Preconditions: User is logged in. Trigger: User opens Shared Songs Library. Main Flow: User opens shared library → system lists shared songs → user selects a song to listen to. Postconditions: None. Related User Stories: US14
+UC10: Remove Shared Song (Brief)
+Primary Actor: Based Song Enjoyer Goal: Remove a shared song from their shared list. Preconditions: User is logged in; song appears in shared library. Trigger: User selects Remove. Main Flow:
+The system removes the song from the user’s “shared with me” list.
+The System updates the shared library view.
+ Postconditions: Song no longer appears in the shared list. Related User Stories: US15
+UC11: Download Shared Song (Brief)
+Primary Actor: Based Song Enjoyer Goal: Download a shared song for offline listening (if permitted). Preconditions: User is authorized for the song and download is allowed by permissions. Trigger: User selects Download on shared song. Main Flow:
+The System verifies access permissions.
+The System provides the downloadable file.
+ Postconditions: Song is downloaded. Related User Stories: US13
+UC12: Revoke Sharing Access (Brief)
+Primary Actor: Artist Goal: Revoke access to a previously shared song. Preconditions: Artist is logged in; song is shared; permissions exist. Trigger: Artist selects Revoke Access. Main Flow:
+The system shows current sharing permissions.
+Artist revokes access for a user/group.
+System updates permissions immediately.
+ Postconditions: Revoked users can no longer access the shared song. Related User Stories: US10
+UC13: Set Sharing Permissions (Brief)
+Primary Actor: Artist Goal: Control who can view/download a shared song. Preconditions: Artist is logged in; song exists; sharing is initiated. Trigger: Artist selects Set Permissions. Main Flow:
+Artist enters allowed emails and selects permissions (view/download).
+System stores and enforces permissions.
+Postconditions: Permissions are active. Related User Stories: US9
+Functional Requirements
+FR1. User Login The system shall allow users to log in using a Google account.
+(Related Feature: F1 – User Authentication)
+FR2. AI Song Generation The system shall allow users to generate songs using AI based on provided inputs.
+(Related Feature: F2 – AI Music Creation)
+FR3. View Generated Songs The system shall allow users to view all songs they have generated.
+(Related Feature: F3 – Music Library)
+FR4. Sort and Filter Songs The system shall allow users to sort songs by name or generated date and time, and filter songs by tags and genre.
+(Related Feature: F3 – Music Library)
+FR5. In-App Song Playback The system shall allow users to play songs within the application using playback controls.
+(Related Feature: F4 – Song Features)
+FR6. Share Songs The system shall allow users to share songs with other users via links or controlled access.
+(Related Feature: F5 – Download and Sharing)
+FR7. Download Songs The system shall allow users to download songs for offline listening.
+(Related Feature: F4 – Song Features, F5 – Download and Sharing)
+FR8. Manage Sharing Permissions (added – clearly required by your features) The system shall allow users to manage and revoke sharing permissions for their songs.
+(Related Feature: F6 – Sharing Management)
+FR9. View Shared Songs (added – required for shared content flow) The system shall allow users to view songs that have been shared with them.
+(Related Feature: F7 – Shared Content Management)
+FR10. Delete Songs The system shall allow users to delete songs from their library.
+(Related Feature: F3 – Music Library)
+FR11. User Logout The system shall allow users to log out of the application.
+(Related Feature: F1 – User Authentication)
+FR12. Access Shared Links The system shall allow users to open shared song or playlist links and listen to the shared content.
+(Related Feature: F5 – Download and Sharing, F7 – Shared Content Management)
+Non-Functional Requirements
+These are the NFR* that does not fit into any specific functionality
+NFR1. Secure AuthenticationThe system shall use secure Google OAuth authentication to verify user identities.
+(Related User Stories: US1, US2)
+NFR2. Data ReliabilityThe system shall reliably store generated songs and allow them to be retrieved without data loss under normal operating conditions.
+(Related User Stories: US1)
+NFR3. System AvailabilityThe system shall maintain a minimum uptime of 90% to ensure continued access to music and shared content.
+(Related User Stories: US17)
+NFR4. PerformanceThe system shall support up to 100 concurrent users and up to 2  concurrent AI-generated songs without system failure or response timeouts.
+(Related User Stories: US16)
+NFR5. ScalabilityThe system shall support horizontal scaling without requiring major architectural changes but only configuration changes, in order to accommodate future increases in users, data, and processing demands.
+(Related User Stories: US16)
+NFR6. Security (Input Validation) The inputs for song generation shall be validated and sanitized to comply with Suno AI’s API Terms of Service (TOS).
+(Related User Stories: US1)
+NFR7. Security (Access Control) The system shall ensure that users can only manage their own songs and playlists. Access control shall apply to all authenticated users.
+(Related User Stories: US1, US2)
+NFR8. Usability The system shall display progress indicators while a song is being generated so that users are informed that the process is ongoing.
+(Related User Stories: US2)
+Mockups
+Hand drawn mockups
+Glossary
+IEEE 830: Software Requirements Specification Standard *link in references
+AI: Artificial intelligence.
+UAT: User acceptance testing.
+TOKEN: the credit used when generating a song.
+Based Song Enjoyer: Listening Users, started off as an inside joke but is now a new buzz word marketing term used in the genAlpha musical industry Domain to boost advertisement.
+API: Application Programming Interface.
+TOS: Terms Of Service
+FR / NFR: Functional requirements and Non Functional requirements.
+Appendices
+A: Market Research Reference of the increasing interest of users in Making their own ai music.
+Licensing
+The intellectual property rights of the developed software shall be transferred to the client after delivery and acceptance.
+The generated music content produced by the system shall not be owned by the client and shall remain governed by the licensing terms of Suno AI.
+3rd Party Integrations and References
+Google OAuth: Google authentication system OAuth  2.0 Documentation
+SUNO: Music Generation API Documentation
+IEEE 830 Software Requirements Specification Standard (link)

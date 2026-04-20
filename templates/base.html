@@ -1,48 +1,131 @@
 <!DOCTYPE html>
+{% load socialaccount %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Music Project{% endblock %}</title>
+    <title>{% block title %}Chithara AI Music Generator{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
+        * { font-family: 'Inter', sans-serif; }
+        body { background-color: #080b14; color: #f1f5f9; }
+
+        .glass {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,0.07);
         }
-        .glass-panel {
-            background: rgba(30, 41, 59, 0.7);
+        .glass-light {
+            background: rgba(30, 41, 59, 0.5);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 1rem;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        /* Floating profile widget */
+        #profile-widget {
+            position: fixed;
+            top: 1.25rem;
+            right: 1.25rem;
+            z-index: 100;
+        }
+        #profile-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            right: 0;
+            min-width: 200px;
+        }
+        #profile-widget:hover #profile-dropdown,
+        #profile-widget.open #profile-dropdown {
+            display: block;
+        }
+
+        /* Scrollable panels */
+        .library-panel {
+            height: calc(100vh - 2rem);
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(139,92,246,0.3) transparent;
+        }
+        .library-panel::-webkit-scrollbar { width: 4px; }
+        .library-panel::-webkit-scrollbar-track { background: transparent; }
+        .library-panel::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.3); border-radius: 2px; }
+
+        /* Song card hover */
+        .song-card { transition: all 0.2s ease; }
+        .song-card:hover { transform: translateY(-2px); border-color: rgba(139,92,246,0.4) !important; }
+
+        /* Animated gradient title */
+        .gradient-text {
+            background: linear-gradient(135deg, #818cf8, #c084fc, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Pulse ring on generate button */
+        .pulse-ring {
+            animation: pulse-ring 2s ease-out infinite;
+        }
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(139,92,246,0.4); }
+            70% { box-shadow: 0 0 0 12px rgba(139,92,246,0); }
+            100% { box-shadow: 0 0 0 0 rgba(139,92,246,0); }
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
-    <!-- Navbar -->
-    <nav class="glass-panel sticky top-0 z-50 m-4 px-6 py-4 flex items-center justify-between">
-        <a href="{% url 'index' %}" class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
-            MusicDomain
-        </a>
-        <div class="space-x-4">
-            <a href="{% url 'song-list' %}" class="hover:text-purple-400 transition-colors">Songs</a>
-            <a href="{% url 'library-list' %}" class="hover:text-purple-400 transition-colors">Libraries</a>
-            <a href="{% url 'libraryentry-list' %}" class="hover:text-purple-400 transition-colors">Library Entries</a>
-            <a href="{% url 'sharelink-list' %}" class="hover:text-purple-400 transition-colors">Shares</a>
-            <a href="{% url 'user-list' %}" class="hover:text-purple-400 transition-colors">Users</a>
-        </div>
-    </nav>
+<body class="min-h-screen">
 
-    <!-- Main Content -->
-    <main class="flex-grow container mx-auto px-4 py-8">
+    {# ── Floating Profile Widget ── #}
+    {% if user.is_authenticated %}
+    <div id="profile-widget">
+        <button onclick="document.getElementById('profile-widget').classList.toggle('open')"
+                class="glass flex items-center space-x-2 px-3 py-2 rounded-full hover:border-purple-500/40 transition-all cursor-pointer">
+            {# Avatar: Google picture or initials #}
+            {% with user.socialaccount_set.all|first as social %}
+                {% if social.extra_data.picture %}
+                    <img src="{{ social.extra_data.picture }}" class="w-7 h-7 rounded-full object-cover" alt="avatar">
+                {% else %}
+                    <div class="w-7 h-7 rounded-full bg-purple-600 flex items-center justify-center text-xs font-bold text-white">
+                        {{ user.username|first|upper }}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            <span class="text-sm font-medium text-slate-200 max-w-[120px] truncate">{{ user.get_full_name|default:user.username }}</span>
+            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+
+        <div id="profile-dropdown">
+            <div class="glass rounded-xl overflow-hidden shadow-xl">
+                <div class="px-4 py-3 border-b border-white/5">
+                    <p class="text-xs text-slate-500">Signed in as</p>
+                    <p class="text-sm font-semibold text-white truncate">{{ user.email }}</p>
+                </div>
+                <form method="post" action="{% url 'account_logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                        <span>Sign Out</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {# ── Page Content ── #}
+    <main>
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
-    <footer class="mt-auto py-6 text-center text-slate-400 glass-panel m-4">
-        <p>&copy; 2026 Music Project CRUD Dashboard</p>
-    </footer>
+    <script>
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const widget = document.getElementById('profile-widget');
+            if (widget && !widget.contains(e.target)) {
+                widget.classList.remove('open');
+            }
+        });
+    </script>
 </body>
 </html>
