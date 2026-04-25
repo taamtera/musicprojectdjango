@@ -10,35 +10,95 @@
     </a>
 </div>
 
-<div class="glass-panel overflow-hidden">
-    <table class="w-full text-left border-collapse">
-        <thead>
-            <tr class="bg-slate-800/50 border-b border-slate-700/50">
-                <th class="p-4 font-semibold text-slate-300">Song</th>
-                <th class="p-4 font-semibold text-slate-300">Creator</th>
-                <th class="p-4 font-semibold text-slate-300">Recipient Email</th>
-                <th class="p-4 font-semibold text-slate-300">Permissions</th>
-                <th class="p-4 font-semibold text-slate-300 text-right">Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for link in object_list %}
-            <tr class="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
-                <td class="p-4 font-medium">{{ link.song.title }}</td>
-                <td class="p-4 text-slate-400">{{ link.creator.username }}</td>
-                <td class="p-4 text-slate-400">{{ link.email }}</td>
-                <td class="p-4 text-slate-400"><span class="px-2 py-1 rounded-full text-xs bg-pink-900/50 text-pink-300 border border-pink-700/50">{{ link.perm }}</span></td>
-                <td class="p-4 text-right space-x-2">
-                    <a href="{% url 'sharelink-update' link.pk %}" class="text-blue-400 hover:text-blue-300 transition-colors">Edit</a>
-                    <a href="{% url 'sharelink-delete' link.pk %}" class="text-red-400 hover:text-red-300 transition-colors">Delete</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="5" class="p-8 text-center text-slate-500">No share links found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+{% include "frontend/partials/filter_sort.html" %}
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for link in object_list %}
+    <div id="share-card-{{ forloop.counter }}" class="glass-panel song-card p-5 group hover:border-blue-500/50 transition-all duration-300 relative overflow-hidden flex flex-col">
+        <!-- Play Button & Badge -->
+        <div class="flex justify-between items-start mb-4">
+            {% if link.song.audio_url or link.song.audio_file %}
+            <button onclick="playSong('{% if link.song.audio_file %}{{ link.song.audio_file.url }}{% else %}{{ link.song.audio_url }}{% endif %}', '{{ link.song.title|escapejs }}', '{{ link.song.genre|escapejs }}', 'share-card-{{ forloop.counter }}')" 
+                    class="h-10 w-10 bg-blue-600 hover:bg-blue-500 text-white rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-110 active:scale-95 group-hover:pulse-ring">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                </svg>
+            </button>
+            {% else %}
+            <div class="h-10 w-10 bg-slate-800 rounded-full flex items-center justify-center text-slate-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+            </div>
+            {% endif %}
+            
+            <span class="px-2 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold bg-purple-900/40 text-purple-400 border border-purple-700/50">
+                Shared
+            </span>
+        </div>
+
+        <!-- Share Info -->
+        <div class="mb-4">
+            <h3 class="text-xl font-bold text-white group-hover:text-blue-400 transition-colors truncate pr-16">{{ link.song.title }}</h3>
+            <div class="flex items-center gap-2 mt-2 text-slate-400 text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <span>To: {{ link.email }}</span>
+            </div>
+            <p class="text-slate-500 text-[11px] mt-1">Created by {{ link.creator.username }}</p>
+        </div>
+
+        <!-- Permissions Section -->
+        <div class="bg-slate-900/50 rounded-xl p-3 mb-4 border border-slate-700/50">
+            <p class="text-xs font-semibold text-slate-400 mb-2 uppercase tracking-tight">Active Permissions:</p>
+            <div class="flex flex-wrap gap-2">
+                {% if link.can_view %}
+                <span class="text-[10px] bg-blue-900/30 text-blue-300 px-2 py-1 rounded border border-blue-800/50 flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span> View
+                </span>
+                {% endif %}
+                {% if link.can_download %}
+                <span class="text-[10px] bg-green-900/30 text-green-300 px-2 py-1 rounded border border-green-800/50 flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> Download
+                </span>
+                {% endif %}
+                {% if link.can_share_forward %}
+                <span class="text-[10px] bg-pink-900/30 text-pink-300 px-2 py-1 rounded border border-pink-800/50 flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-pink-400"></span> Reshare
+                </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center justify-between mt-auto pt-4 border-t border-slate-700/30">
+            <div class="flex gap-4">
+                <a href="{% url 'sharelink-update' link.pk %}" class="text-slate-400 hover:text-blue-400 transition-colors flex items-center gap-1 text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    Edit
+                </a>
+                <a href="{% url 'sharelink-delete' link.pk %}" class="text-slate-400 hover:text-red-400 transition-colors flex items-center gap-1 text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Delete
+                </a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-span-full py-20 text-center glass-panel">
+        <div class="text-slate-500 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6a3 3 0 100-2.684m0 2.684l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+            </svg>
+        </div>
+        <p class="text-xl text-slate-400">No active shares found.</p>
+        <p class="text-slate-500 mt-2">Start sharing your music with others!</p>
+    </div>
+    {% endfor %}
 </div>
 {% endblock %}

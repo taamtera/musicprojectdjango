@@ -13,7 +13,7 @@ ENV/
 db.sqlite3
 db.sqlite3-journal
 static/
-media/
+media/songs/
 staticfiles/
 
 # IDEs

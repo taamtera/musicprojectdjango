@@ -1,32 +1,71 @@
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views import View
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from backend.models import Song
+import json
+import requests
+import time
+from django.conf import settings
 
 class SongListView(LoginRequiredMixin, ListView):
     model = Song
     template_name = 'frontend/song_list.html'
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        sort_by = self.request.GET.get('sort', '-created_at')
-        genre_filter = self.request.GET.get('genre', '')
+        # Only show songs that belong to the current user's library
+        queryset = self.request.user.listens_to.all()
         
-        if genre_filter:
-            queryset = queryset.filter(genre__icontains=genre_filter)
+        from django.db.models import Q
+        sort_by = self.request.GET.get('sort', '-created_at')
+        query = self.request.GET.get('title', '')
+        
+        if query:
+            queryset = queryset.filter(
+                Q(title__icontains=query) | 
+                Q(genre__icontains=query) | 
+                Q(description__icontains=query)
+            )
             
         if sort_by in ['title', '-title', 'created_at', '-created_at']:
             queryset = queryset.order_by(sort_by)
             
         return queryset
 
-import requests
-import time
-from django.conf import settings
+@method_decorator(csrf_exempt, name='dispatch')
+class SongCallbackView(View):
+    def post(self, request, token, *args, **kwargs):
+        try:
+            song = Song.objects.get(callback_token=token)
+            data = json.loads(request.body)
+            
+            # Example: Suno callback might contain 'data' list with objects having 'audio_url'
+            # Adjust this logic based on the actual API response structure
+            if isinstance(data, dict):
+                audio_url = data.get('audio_url') or data.get('url')
+                if not audio_url and 'data' in data and isinstance(data['data'], list):
+                    audio_url = data['data'][0].get('audio_url')
+                
+                if audio_url:
+                    song.audio_url = audio_url
+                    song.gen_status = 'done'
+                    song.save()
+                    return JsonResponse({'status': 'success'})
+            
+            return JsonResponse({'status': 'error', 'message': 'No audio URL found'}, status=400)
+            
+        except Song.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Invalid token'}, status=404)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
 
 class SongCreateView(LoginRequiredMixin, CreateView):
     model = Song
-    fields = ['title', 'genre', 'tags', 'description', 'generation_method']
+    fields = ['title', 'genre', 'description', 'generation_method']
     template_name = 'generic_form.html'
     success_url = reverse_lazy('song-list')
 
@@ -42,7 +81,12 @@ class SongCreateView(LoginRequiredMixin, CreateView):
         else:
             self._call_mock_api(form.instance)
             
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        
+        # Add the newly created song to the user's library (listens_to)
+        self.request.user.listens_to.add(self.object)
+        
+        return response
 
     def _call_mock_api(self, song):
         """Simulate an API call with a mock response."""
@@ -55,6 +99,19 @@ class SongCreateView(LoginRequiredMixin, CreateView):
         url = "https://api.sunoapi.org/api/v1/generate"
         token = settings.SUNO_API_TOKEN
         
+        # Construct the absolute callback URL
+        callback_url = self.request.build_absolute_uri(
+            reverse('song-callback', kwargs={'token': song.callback_token})
+        )
+        
+        # Override for local testing if needed
+        if '127.0.0.1' in callback_url or 'localhost' in callback_url:
+            callback_url = callback_url.replace('127.0.0.1:8000', 'taamtera.space')
+            callback_url = callback_url.replace('localhost:8000', 'taamtera.space')
+            # Ensure it uses https if that's what your domain uses
+            if not callback_url.startswith('https'):
+                callback_url = callback_url.replace('http://', 'https://')
+        
         payload = {
             "customMode": True,
             "instrumental": False,
@@ -63,6 +120,7 @@ class SongCreateView(LoginRequiredMixin, CreateView):
             "style": song.genre,
             "title": song.title,
             "negativeTags": "",
+            "callbackUrl": callback_url,
         }
         
         headers = {
@@ -75,10 +133,13 @@ class SongCreateView(LoginRequiredMixin, CreateView):
             data = response.json()
             
             if response.status_code == 200 and data.get("code") == 200:
-                # The API returns a taskId. For now, we'll store it in description or similar
-                # or just mark it as in-progress.
+                # Extract taskId from response
+                task_id = data.get("data")
+                if isinstance(task_id, dict):
+                    task_id = task_id.get("taskId")
+                
+                song.task_id = task_id
                 song.gen_status = 'in-progress'
-                # Note: Real Suno API uses a callback or polling to get the actual URL
             else:
                 song.gen_status = 'failed'
         except Exception as e:
@@ -91,7 +152,7 @@ class SongCreateView(LoginRequiredMixin, CreateView):
 
 class SongUpdateView(LoginRequiredMixin, UpdateView):
     model = Song
-    fields = ['title', 'genre', 'tags', 'description', 'gen_status', 'audio_url']
+    fields = ['title', 'genre', 'description', 'gen_status', 'gen_status_result', 'audio_url', 'task_id']
     template_name = 'generic_form.html'
     success_url = reverse_lazy('song-list')
 

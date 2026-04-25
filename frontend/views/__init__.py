@@ -3,7 +3,7 @@ from .users import (
     UserListView, UserCreateView, UserUpdateView, UserDeleteView
 )
 from .songs import (
-    SongListView, SongCreateView, SongUpdateView, SongDeleteView
+    SongListView, SongCreateView, SongUpdateView, SongDeleteView, SongCallbackView
 )
 from .shares import (
     ShareLinkListView, ShareLinkCreateView, ShareLinkUpdateView, ShareLinkDeleteView

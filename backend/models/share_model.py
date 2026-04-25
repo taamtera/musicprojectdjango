@@ -7,6 +7,7 @@ class ShareLink(models.Model):
     can_view = models.BooleanField(default=True)
     can_download = models.BooleanField(default=False)
     can_share_forward = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Share Link by {self.creator.username} for {self.song.title} to {self.email}"
