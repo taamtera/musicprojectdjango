@@ -5,12 +5,12 @@ from backend.models import User
 
 class UserListView(LoginRequiredMixin, ListView):
     model = User
-    template_name = 'frontend/user_list.html'
+    template_name = 'users/list.html'
 
 class UserCreateView(LoginRequiredMixin, CreateView):
     model = User
     fields = ['username', 'email', 'name', 'is_staff']
-    template_name = 'generic_form.html'
+    template_name = 'common/form.html'
     success_url = reverse_lazy('user-list')
 
     def get_context_data(self, **kwargs):
@@ -21,7 +21,7 @@ class UserCreateView(LoginRequiredMixin, CreateView):
 class UserUpdateView(LoginRequiredMixin, UpdateView):
     model = User
     fields = ['username', 'email', 'name', 'is_staff']
-    template_name = 'generic_form.html'
+    template_name = 'common/form.html'
     success_url = reverse_lazy('user-list')
 
     def get_context_data(self, **kwargs):
@@ -31,5 +31,5 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
 
 class UserDeleteView(LoginRequiredMixin, DeleteView):
     model = User
-    template_name = 'generic_confirm_delete.html'
+    template_name = 'common/confirm_delete.html'
     success_url = reverse_lazy('user-list')

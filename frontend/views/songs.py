@@ -13,7 +13,7 @@ from django.conf import settings
 
 class SongListView(LoginRequiredMixin, ListView):
     model = Song
-    template_name = 'frontend/song_list.html'
+    template_name = 'songs/list.html'
 
     def get_queryset(self):
         # Only show songs that belong to the current user's library
@@ -66,7 +66,7 @@ class SongCallbackView(View):
 class SongCreateView(LoginRequiredMixin, CreateView):
     model = Song
     fields = ['title', 'genre', 'description', 'generation_method']
-    template_name = 'generic_form.html'
+    template_name = 'common/form.html'
     success_url = reverse_lazy('song-list')
 
     def form_valid(self, form):
@@ -155,7 +155,7 @@ class SongCreateView(LoginRequiredMixin, CreateView):
 class SongUpdateView(LoginRequiredMixin, UpdateView):
     model = Song
     fields = ['title', 'genre', 'description', 'gen_status', 'gen_status_result', 'audio_url', 'task_id']
-    template_name = 'generic_form.html'
+    template_name = 'common/form.html'
     success_url = reverse_lazy('song-list')
 
     def get_context_data(self, **kwargs):
@@ -165,5 +165,5 @@ class SongUpdateView(LoginRequiredMixin, UpdateView):
 
 class SongDeleteView(LoginRequiredMixin, DeleteView):
     model = Song
-    template_name = 'generic_confirm_delete.html'
+    template_name = 'common/confirm_delete.html'
     success_url = reverse_lazy('song-list')

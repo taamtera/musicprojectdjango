@@ -5,7 +5,7 @@ from backend.models import ShareLink
 
 class ShareLinkListView(LoginRequiredMixin, ListView):
     model = ShareLink
-    template_name = 'frontend/sharelink_list.html'
+    template_name = 'shares/list.html'
 
     def get_queryset(self):
         # Only show shares created by the current user
@@ -34,7 +34,7 @@ class ShareLinkListView(LoginRequiredMixin, ListView):
 class ShareLinkCreateView(LoginRequiredMixin, CreateView):
     model = ShareLink
     fields = ['song', 'creator', 'email', 'can_view', 'can_download', 'can_share_forward']
-    template_name = 'generic_form.html'
+    template_name = 'common/form.html'
     success_url = reverse_lazy('sharelink-list')
 
     def get_context_data(self, **kwargs):
@@ -45,7 +45,7 @@ class ShareLinkCreateView(LoginRequiredMixin, CreateView):
 class ShareLinkUpdateView(LoginRequiredMixin, UpdateView):
     model = ShareLink
     fields = ['song', 'creator', 'email', 'can_view', 'can_download', 'can_share_forward']
-    template_name = 'generic_form.html'
+    template_name = 'common/form.html'
     success_url = reverse_lazy('sharelink-list')
 
     def get_context_data(self, **kwargs):
@@ -55,5 +55,5 @@ class ShareLinkUpdateView(LoginRequiredMixin, UpdateView):
 
 class ShareLinkDeleteView(LoginRequiredMixin, DeleteView):
     model = ShareLink
-    template_name = 'generic_confirm_delete.html'
+    template_name = 'common/confirm_delete.html'
     success_url = reverse_lazy('sharelink-list')

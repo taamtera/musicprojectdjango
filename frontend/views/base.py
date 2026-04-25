@@ -4,10 +4,10 @@ from backend.models import User
 from django.contrib import messages
 
 def index(request):
-    return render(request, 'index.html')
+    return render(request, 'pages/index.html')
 
 def popup_callback(request):
-    return render(request, 'frontend/popup_callback.html')
+    return render(request, 'pages/popup_callback.html')
 
 def dev_login(request):
     """Automatically log in as the test user for development."""
