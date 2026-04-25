@@ -6,7 +6,7 @@ This repository contains the fully built, consolidated web application for the C
 
 ### Prerequisites
 - Python 3.10+
-- Django 6.0+ (required for official MongoDB backend)
+- Django 5.2 (LTS)
 - MongoDB Database (running locally at `localhost:27017` or configured in settings)
 
 ### Quickstart Guide
@@ -19,27 +19,26 @@ This repository contains the fully built, consolidated web application for the C
    ```
 3. Install the required dependencies:
    ```bash
-   pip install django django-mongodb-backend pymongo django-allauth
+   pip install -r requirements.txt
    ```
-4. Run the database migrations to build your MongoDB schemas locally:
+4. **Environment Configuration**:
+   - Rename `.env.example` (if provided) or create a file named `.env` in the root directory.
+   - Add your Suno API token: `SUNO_API_TOKEN=your_token_here`
+5. Run the database migrations:
    ```bash
-   python manage.py makemigrations
    python manage.py migrate
    ```
-5. Create an administrative superuser account (if you haven't used the automated injection script):
-   ```bash
-   python manage.py createsuperuser
-   ```
-6. Start the development server:
+6. **Testing & Development**:
+   - **Developer Bypass**: On the home page, you can use the "Developer Bypass" link to instantly log in as a test user (`testuser`) without needing Google OAuth setup.
+7. Start the development server:
    ```bash
    python manage.py runserver
    ```
-7. **Google OAuth Setup** (Required for frontend login):
+8. **Google OAuth Setup** (For official production login):
    - Go to [Google Cloud Console](https://console.cloud.google.com/) → APIs & Services → Credentials → Create OAuth 2.0 Client ID (Web application).
    - Under **Authorized redirect URIs**, add exactly: `http://127.0.0.1:8000/accounts/google/login/callback/`
-   - Copy the `client_id` and `secret` into `config/settings.py` under `SOCIALACCOUNT_PROVIDERS > google > APP`.
-   - The callback is handled automatically by `django-allauth` — do not create a custom view for it.
-8. Open a web browser:
+   - Copy the `client_id` and `secret` into `config/settings.py` under `SOCIALACCOUNT_PROVIDERS`.
+9. Open a web browser:
    - Dashboard & App UI: `http://127.0.0.1:8000/`
    - Django Admin: `http://127.0.0.1:8000/admin/`
 

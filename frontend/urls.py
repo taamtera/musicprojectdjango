@@ -5,6 +5,7 @@ urlpatterns = [
     # Dashboard Link
     path('', views.index, name='index'),
     path('popup-callback/', views.popup_callback, name='popup-callback'),
+    path('dev-login/', views.dev_login, name='dev-login'),
 
     # Users
     path('users/', views.UserListView.as_view(), name='user-list'),
