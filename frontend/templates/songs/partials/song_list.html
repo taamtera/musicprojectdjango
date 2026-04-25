@@ -3,12 +3,17 @@
     <div id="song-card-{{ forloop.counter }}" data-song-seed="{{ song.pk }}" class="glass-panel song-card js-seeded-gradient p-5 group hover:border-purple-500/50 transition-all duration-300 relative overflow-hidden flex flex-col {% if song.audio_url or song.audio_file %}cursor-pointer hover:bg-slate-800/50{% endif %}"
          {% if song.audio_url or song.audio_file %}onclick="playSong('{% if song.audio_file %}{{ song.audio_file.url }}{% else %}{{ song.audio_url }}{% endif %}', '{{ song.title|escapejs }}', '{{ song.genre|escapejs }}', 'song-card-{{ forloop.counter }}')"{% endif %}>
 
-        <div class="absolute top-4 right-4">
+        <div class="absolute top-4 right-4 flex flex-col items-end gap-2">
             <span class="px-2 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold
                 {% if song.gen_status == 'done' %}bg-slate-800/50 text-slate-300 border border-slate-600/40
                 {% elif song.gen_status == 'failed' %}bg-red-900/40 text-red-400 border border-red-700/50
                 {% else %}bg-blue-900/40 text-blue-400 border border-blue-700/50{% endif %}">
                 {{ song.gen_status }}
+            </span>
+            <span class="px-2 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold
+                {% if song.generation_method == 'suno' %}bg-orange-900/40 text-orange-300 border border-orange-700/50
+                {% else %}bg-slate-800/50 text-slate-300 border border-slate-600/40{% endif %}">
+                {{ song.generation_method }}
             </span>
         </div>
 

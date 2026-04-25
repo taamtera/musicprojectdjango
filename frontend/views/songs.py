@@ -139,9 +139,9 @@ class SongCreateView(LandingLoginRequiredMixin, CreateView):
                 callback_url = callback_url.replace('http://', 'https://')
         
         payload = {
-            "customMode": True,
+            "customMode": False,
             "instrumental": False,
-            "model": "V4_5ALL",
+            "model": "V5",
             "prompt": song.description or "A music track",
             "style": song.genre,
             "title": song.title,
