@@ -178,6 +178,30 @@ sequenceDiagram
     Template->>Template: Display song with<br/>status='done'<br/>and audio player
 ```
 
+   ## Mock Song Generation Sequence
+
+   ```mermaid
+   sequenceDiagram
+      participant Template as Template<br/>common/form.html
+      participant SongView as Controller<br/>SongCreateView.form_valid(form)
+      participant SongModel as Model<br/>Song
+      participant DB as Database
+
+      Template->>SongView: submit form<br/>(title, genre, description, generation_method='mock')
+      activate SongView
+      SongView->>SongView: form_valid(form)
+      SongView->>SongView: _call_mock_api(song)
+      SongView->>SongModel: set generated_by, task_id, gen_status='in-progress', audio_url=fixed link
+      SongView->>DB: save()
+      deactivate SongView
+      DB->>DB: gen_status='done'<br/>audio_url=fixed link
+
+      SongView->>DB: SongListView.get_queryset(self)
+      DB-->>SongView: songs [updated]
+      SongView->>Template: render_to_response(context)
+      Template->>Template: Display song with<br/>status='done'<br/>and audio player
+   ```
+
 
 ## CRUD Operations
 
