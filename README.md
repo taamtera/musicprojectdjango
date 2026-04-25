@@ -96,11 +96,9 @@ flowchart LR
    TL["Template songs/list.html"]
    TLP["Template songs/partials/song_list.html"]
    TFORM["Template common/form.html"]
-   TCONF["Template common/confirm_delete.html"]
    TINDEX["Template pages/index.html"]
-   TPOP["Template pages/popup_callback.html"]
 
-   %% Route to views
+   %% Route to templates
    U --> VB
    U --> VS
    U --> VU
@@ -120,22 +118,18 @@ flowchart LR
    MSL -->|song FK| MS
    MSL -->|creator FK| MU
 
-   %% View to templates
-   VB --> TINDEX
-   VB --> TPOP
-   VS --> TL
-   VS --> TLP
-   VS --> TFORM
-   VS --> TCONF
-   VU --> TFORM
-   VU --> TCONF
-   VSH --> TFORM
-   VSH --> TCONF
+   %% Template to views
+   TINDEX --> VB 
+   TL --> VS 
+   TLP --> VS 
+   TFORM <--> |Generate Song Form| VS 
+   TFORM <--> |Login/Registration Form| VU 
+   TFORM <--> |Share Link Form| VSH 
 
    %% Template composition
-   TL --> TF
-   TL --> TLP
-   TB --> TP
+   TL <-- TF
+   TL <-- TLP
+   TB <-- TP
 
    %% Color coding: M / V / T (+ routes)
    classDef route fill:#1f2937,stroke:#9ca3af,color:#f9fafb,stroke-width:1px;
@@ -146,7 +140,7 @@ flowchart LR
    class U route;
    class VB,VS,VU,VSH view;
    class MU,MS,MSL model;
-   class TB,TP,TF,TL,TLP,TFORM,TCONF,TINDEX,TPOP template;
+   class TB,TP,TF,TL,TLP,TFORM,TINDEX template;
 ```
 
 ## CRUD Operations
