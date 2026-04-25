@@ -83,6 +83,7 @@ flowchart LR
    VS["Controller (views)<br/>songs.py<br/>---<br/>SongListView.get_queryset()<br/>SongListView.render_to_response()<br/>SongCreateView.form_valid()<br/>SongCreateView._call_mock_api()<br/>SongCreateView._call_suno_api()<br/>SongUpdateView.form_valid()<br/>SongDeleteView.delete()<br/>SongCallbackView.post()"]
    VU["Controller (views)<br/>users.py<br/>---<br/>UserListView.get_queryset()<br/>UserCreateView.form_valid()<br/>UserUpdateView.form_valid()<br/>UserDeleteView.delete()"]
    VSH["Controller (views)<br/>shares.py<br/>---<br/>ShareLinkListView.get_queryset()<br/>ShareLinkCreateView.form_valid()<br/>ShareLinkUpdateView.form_valid()<br/>ShareLinkDeleteView.delete()"]
+   VP["Controller (management)<br/>poll_songs.py<br/>---<br/>handle()<br/>check_song_status()<br/>Polls every 30s<br/>Updates gen_status"]
 
    %% Model Layer
    MU["Model user_model.py<br/>---<br/>username<br/>email<br/>name<br/>listens_to M2M"]
@@ -114,6 +115,9 @@ flowchart LR
    VSH --> MSL
    VSH --> MU
    VSH --> MS
+   VP -->|Query in-progress songs| MS
+   VP -->|Update gen_status| MS
+   VP -->|Polls every 30s| VP
 
    %% Model relations
    MU -->|listens_to M2M| MS
@@ -141,7 +145,7 @@ flowchart LR
    classDef template fill:#7c2d12,stroke:#fdba74,color:#fff7ed,stroke-width:1px;
 
    class U route;
-   class VB,VS,VU,VSH view;
+   class VB,VS,VU,VSH,VP view;
    class MU,MS,MSL model;
    class TB,TP,TF,TL,TLP,TFORM,TINDEX template;
 ```
