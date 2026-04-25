@@ -79,26 +79,26 @@ flowchart LR
    U["frontend/urls.py<br/>Routes"]
 
    %% View/Controller Layer
-   VB["views/base.py (Controller)<br/>index()<br/>popup_callback()<br/>dev_login()<br/>serve_audio()"]
-   VS["views/songs.py (Controller)<br/>SongListView.get_queryset()<br/>SongListView.render_to_response()<br/>SongCreateView.form_valid()<br/>SongCreateView._call_mock_api()<br/>SongCreateView._call_suno_api()<br/>SongUpdateView (CRUD: update)<br/>SongDeleteView (CRUD: delete)<br/>SongCallbackView.post()"]
-   VU["views/users.py (Controller)<br/>UserListView (CRUD: read)<br/>UserCreateView (CRUD: create)<br/>UserUpdateView (CRUD: update)<br/>UserDeleteView (CRUD: delete)"]
-   VSH["views/shares.py (Controller)<br/>ShareLinkListView.get_queryset()<br/>ShareLinkCreateView (CRUD: create)<br/>ShareLinkUpdateView (CRUD: update)<br/>ShareLinkDeleteView (CRUD: delete)"]
+   VB["Controller (views)<br/>base.py<br/>---<br/>index()<br/>popup_callback()<br/>dev_login()<br/>serve_audio()"]
+   VS["Controller (views)<br/>songs.py<br/>---<br/>SongListView.get_queryset()<br/>SongListView.render_to_response()<br/>SongCreateView.form_valid()<br/>SongCreateView._call_mock_api()<br/>SongCreateView._call_suno_api()<br/>SongUpdateView.form_valid()<br/>SongDeleteView.delete()<br/>SongCallbackView.post()"]
+   VU["Controller (views)<br/>users.py<br/>---<br/>UserListView.get_queryset()<br/>UserCreateView.form_valid()<br/>UserUpdateView.form_valid()<br/>UserDeleteView.delete()"]
+   VSH["Controller (views)<br/>shares.py<br/>---<br/>ShareLinkListView.get_queryset()<br/>ShareLinkCreateView.form_valid()<br/>ShareLinkUpdateView.form_valid()<br/>ShareLinkDeleteView.delete()"]
 
    %% Model Layer
-   MU["backend/models/user_model.py<br/>User"]
-   MS["backend/models/song_model.py<br/>Song"]
-   MSL["backend/models/share_model.py<br/>ShareLink"]
+   MU["Model user_model.py<br/>---<br/>username<br/>email<br/>name<br/>listens_to M2M"]
+   MS["Model song_model.py<br/>---<br/>title<br/>genre<br/>description<br/>gen_status<br/>gen_status_result<br/>generation_method<br/>task_id<br/>audio_url<br/>audio_file<br/>callback_token<br/>created_at<br/>generated_by FK"]
+   MSL["Model share_model.py<br/>---<br/>song FK<br/>creator FK<br/>email<br/>can_view<br/>can_download<br/>can_share_forward<br/>created_at"]
 
    %% Template Layer
-   TB["templates/base.html<br/>Layout + SPA navigation"]
-   TP["templates/components/player.html<br/>Global audio player"]
-   TF["templates/components/filter_sort.html<br/>Search/Sort AJAX"]
-   TL[templates/songs/list.html]
-   TLP[templates/songs/partials/song_list.html]
-   TFORM[templates/common/form.html]
-   TCONF[templates/common/confirm_delete.html]
-   TINDEX[templates/pages/index.html]
-   TPOP[templates/pages/popup_callback.html]
+   TB["Template base.html"]
+   TP["Template player.html"]
+   TF["Template filter_sort.html"]
+   TL["Template songs/list.html"]
+   TLP["Template songs/partials/song_list.html"]
+   TFORM["Template common/form.html"]
+   TCONF["Template common/confirm_delete.html"]
+   TINDEX["Template pages/index.html"]
+   TPOP["Template pages/popup_callback.html"]
 
    %% Route to views
    U --> VB
