@@ -1,6 +1,6 @@
 <!-- Shared Filtering & Sorting Component -->
 <div class="glass-panel p-4 mb-6 flex flex-wrap gap-4 items-center">
-    <form method="get" class="flex gap-4 w-full">
+    <form id="song-filter-form" method="get" class="flex gap-4 w-full">
         <!-- Search Input -->
         <div class="relative flex-1">
             <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
@@ -8,18 +8,31 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
             </span>
-            <input type="text" name="title" placeholder="Search by Title, Genre, or Description..." value="{{ request.GET.title }}" 
-                   class="w-full bg-slate-800/50 border border-slate-700 rounded-lg pl-10 pr-4 py-2 text-white focus:outline-none focus:border-purple-500 transition-all">
+            <input
+                id="song-search-input"
+                type="text"
+                name="title"
+                placeholder="Search by Title, Genre, or Description..."
+                value="{{ request.GET.title }}"
+                autocomplete="off"
+                class="w-full bg-slate-800/50 border border-slate-700 rounded-lg pl-10 pr-4 py-2 text-white focus:outline-none focus:border-purple-500 transition-all">
         </div>
 
         <!-- Sort Dropdown -->
         <div class="relative min-w-[200px]">
-            <select name="sort" onchange="this.form.submit()" 
-                    class="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-white appearance-none focus:outline-none focus:border-purple-500 cursor-pointer">
-                <option value="-created_at" {% if request.GET.sort == '-created_at' %}selected{% endif %}>Newest First</option>
-                <option value="created_at" {% if request.GET.sort == 'created_at' %}selected{% endif %}>Oldest First</option>
-                <option value="title" {% if request.GET.sort == 'title' %}selected{% endif %}>Title (A-Z)</option>
-                <option value="-title" {% if request.GET.sort == '-title' %}selected{% endif %}>Title (Z-A)</option>
+            <select id="song-sort-select" name="sort"
+class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white appearance-none focus:outline-none focus:border-purple-500 cursor-pointer">
+                <option class="bg-slate-800 text-white" value="-created_at" {% if request.GET.sort == '-created_at' or not request.GET.sort %}selected{% endif %}>Newest</option>
+                <option class="bg-slate-800 text-white" value="created_at" {% if request.GET.sort == 'created_at' %}selected{% endif %}>Oldest</option>
+
+                <option class="bg-slate-800 text-white" value="title" {% if request.GET.sort == 'title' %}selected{% endif %}>Title (A-Z)</option>
+                <option class="bg-slate-800 text-white" value="-title" {% if request.GET.sort == '-title' %}selected{% endif %}>Title (Z-A)</option>
+
+                <option class="bg-slate-800 text-white" value="genre" {% if request.GET.sort == 'genre' %}selected{% endif %}>Genre (A-Z)</option>
+                <option class="bg-slate-800 text-white" value="-genre" {% if request.GET.sort == '-genre' %}selected{% endif %}>Genre (Z-A)</option>
+
+                <option class="bg-slate-800 text-white" value="status_done" {% if request.GET.sort == 'status_done' %}selected{% endif %}>Done First</option>
+                <option class="bg-slate-800 text-white" value="status_progress" {% if request.GET.sort == 'status_progress' %}selected{% endif %}>In Progress First</option>
             </select>
             <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-500">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -32,3 +45,48 @@
         <button type="submit" class="hidden">Apply</button>
     </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('song-filter-form');
+    const input = document.getElementById('song-search-input');
+    const sortSelect = document.getElementById('song-sort-select');
+    const results = document.getElementById('song-results');
+
+    if (!form || !input || !sortSelect || !results) return;
+
+    let timer = null;
+
+    function fetchSongs() {
+        const params = new URLSearchParams(new FormData(form));
+        const currentSort = sortSelect.value || '-created_at';
+
+        params.set('sort', currentSort);
+
+        fetch(`?${params.toString()}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            results.innerHTML = data.html;
+            sortSelect.value = currentSort;
+            history.replaceState(null, '', '?' + params.toString());
+        })
+        .catch(err => console.error('Song search failed:', err));
+    }
+
+    input.addEventListener('input', function () {
+        clearTimeout(timer);
+        timer = setTimeout(fetchSongs, 400);
+    });
+
+    sortSelect.addEventListener('change', fetchSongs);
+
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        fetchSongs();
+    });
+});
+</script>

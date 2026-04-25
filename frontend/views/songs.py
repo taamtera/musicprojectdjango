@@ -10,30 +10,54 @@ import json
 import requests
 import time
 from django.conf import settings
+from django.template.loader import render_to_string
+from django.http import JsonResponse
 
 class SongListView(LandingLoginRequiredMixin, ListView):
     model = Song
     template_name = 'songs/list.html'
+    context_object_name = 'songs'
 
     def get_queryset(self):
-        # Only show songs that belong to the current user's library
         queryset = self.request.user.listens_to.all()
-        
+
         from django.db.models import Q
         sort_by = self.request.GET.get('sort', '-created_at')
-        query = self.request.GET.get('title', '')
-        
+        query = self.request.GET.get('title', '').strip()
+
         if query:
             queryset = queryset.filter(
-                Q(title__icontains=query) | 
-                Q(genre__icontains=query) | 
+                Q(title__icontains=query) |
+                Q(genre__icontains=query) |
                 Q(description__icontains=query)
             )
-            
-        if sort_by in ['title', '-title', 'created_at', '-created_at']:
-            queryset = queryset.order_by(sort_by)
-            
+
+        sort_options = {
+            '-created_at': '-created_at',   # Newest
+            'created_at': 'created_at',     # Oldest
+            'title': 'title',               # Title A-Z
+            '-title': '-title',             # Title Z-A
+            'genre': 'genre',               # Genre A-Z
+            '-genre': '-genre',             # Genre Z-A
+            'status_done': '-gen_status',   # Status Done First
+            'status_progress': 'gen_status' # Status In Progress First
+        }
+
+        queryset = queryset.order_by(sort_options.get(sort_by, '-created_at'))
+
         return queryset
+
+    def render_to_response(self, context, **response_kwargs):
+        # 👇 THIS is what enables no-refresh search
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            html = render_to_string(
+                'songs/partials/song_list.html',
+                context,
+                request=self.request
+            )
+            return JsonResponse({'html': html})
+
+        return super().render_to_response(context, **response_kwargs)
 
 @method_decorator(csrf_exempt, name='dispatch')
 class SongCallbackView(View):

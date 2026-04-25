@@ -1,0 +1,65 @@
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for song in object_list %}
+    <div id="song-card-{{ forloop.counter }}" class="glass-panel song-card p-5 group hover:border-purple-500/50 transition-all duration-300 relative overflow-hidden flex flex-col {% if song.audio_url or song.audio_file %}cursor-pointer hover:bg-slate-800/50{% endif %}"
+         {% if song.audio_url or song.audio_file %}onclick="playSong('{% if song.audio_file %}{{ song.audio_file.url }}{% else %}{{ song.audio_url }}{% endif %}', '{{ song.title|escapejs }}', '{{ song.genre|escapejs }}', 'song-card-{{ forloop.counter }}')"{% endif %}>
+
+        <div class="absolute top-4 right-4">
+            <span class="px-2 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold
+                {% if song.gen_status == 'done' %}bg-green-900/40 text-green-400 border border-green-700/50
+                {% elif song.gen_status == 'failed' %}bg-red-900/40 text-red-400 border border-red-700/50
+                {% else %}bg-blue-900/40 text-blue-400 border border-blue-700/50{% endif %}">
+                {{ song.gen_status }}
+            </span>
+        </div>
+
+        <div class="mb-4">
+            <h3 class="text-xl font-bold text-white group-hover:text-purple-400 transition-colors truncate pr-16">
+                {{ song.title }}
+            </h3>
+            <p class="text-slate-400 text-sm mt-1">{{ song.genre }}</p>
+        </div>
+
+        <div class="flex-grow mb-4">
+            {% if song.description %}
+            <p class="text-slate-400 text-sm leading-relaxed line-clamp-3">{{ song.description }}</p>
+            {% else %}
+            <p class="text-slate-500 text-sm italic">No description provided</p>
+            {% endif %}
+        </div>
+
+        <div class="flex items-center justify-between mt-auto pt-4 border-t border-slate-700/30">
+            <div class="flex gap-3">
+                <a href="" onclick="event.stopPropagation()" class="text-slate-400 hover:text-blue-400 transition-colors" title="Share">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M2 21l21-9L2 3v7l15 2-15 2z"/>
+                    </svg>
+                </a>
+
+                <a href="{% url 'song-update' song.pk %}" onclick="event.stopPropagation()" class="text-slate-400 hover:text-blue-400 transition-colors" title="Edit">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                </a>
+
+                <a href="{% url 'song-delete' song.pk %}" onclick="event.stopPropagation()" class="text-slate-400 hover:text-red-400 transition-colors" title="Delete">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </a>
+            </div>
+
+            {% if song.audio_url or song.audio_file %}
+            <a href="{% if song.audio_file %}{{ song.audio_file.url }}{% else %}{{ song.audio_url }}{% endif %}" onclick="event.stopPropagation()" download class="text-purple-400 hover:text-purple-300 text-sm font-medium flex items-center gap-1">
+                Download
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% empty %}
+    <div class="col-span-full py-20 text-center glass-panel">
+        <p class="text-xl text-slate-400">Your library is empty.</p>
+        <p class="text-slate-500 mt-2">Start by generating your first song!</p>
+    </div>
+    {% endfor %}
+</div>
