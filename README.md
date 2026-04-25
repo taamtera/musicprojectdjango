@@ -9,7 +9,7 @@ features:
 - Developer Bypass for instant login and testing (TA please use this one)
 - Polymorphic Song Generation with support for multiple APIs (currently Suno API) and MOCK mode for testing without API calls (set during song generation)
 - MOCK mode simulates in-progress processing with a 10-second delay before marking the song done
-- Song generation polled every 10 seconds to check for completion and log updates in terminal (check terminal for progress)
+- SUNO MODE Song generation polled every 10 seconds to check for completion and log updates in terminal (check terminal for progress)
 - Pseudo random gredient for song based on id for unique visual
 - song player with real-time visualizer
 - CRUD operations for songs with dynamic search and sorting capabilities
