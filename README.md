@@ -61,16 +61,34 @@ TODO:
 
 ## Architecture Structure
 
-This project completely drops monolithic structures by separating logic into two core scalable systems:
+The project is separated into two Django apps with clear responsibilities:
 
-- **`backend`**: Houses all database modeling via an `api/models/` folder. Contains schemas for `user_model.py`, `song_model.py`, and `share_model.py`. The Django Admin interface is explicitly registered to expose all these nested attributes.
-- **`frontend`**: Manages the CRUD (Create, Read, Update, Delete) interfaces dynamically. Contains `views.py` handling form processing logic, `urls.py` managing all interaction routes, and `templates/frontend/` presenting the Tailwind-styled HTML views securely.
+- **`backend`**: Owns the data layer. It contains the core database models such as `User`, `Song`, and `ShareLink`. These models define user libraries, generated songs, saved audio files, generation status, and future sharing permissions.
+
+- **`frontend`**: Owns the application interface and user-facing logic. It contains views, routes, templates, reusable UI components, and the song CRUD workflow. This includes song creation, update, deletion, library display, AJAX search/sort, the footer audio player, and the real-time visualizer.
+
+- **Management command / polling service**: A Django management command polls songs with `gen_status='in-progress'`. For Suno songs, it calls the Suno API and downloads the finished audio. For MOCK songs, it skips the external API, downloads the predefined mock audio URL, saves it into `audio_file`, and marks the song as done.
+
+- **Template composition**: The UI is split into reusable templates. `songs/list.html` renders the page shell, `components/filter_sort.html` handles filtering and sorting, and `songs/partials/song_list.html` renders only the song grid so AJAX can update the list without refreshing the full page.
+
+- **Audio playback layer**: The shared footer player is included globally and uses the selected song’s `audio_file` or `audio_url`. The visualizer is separated into its own component and connects to the audio element through the Web Audio API.
 
 ## Core Models
 
-- **`User`**: Base profile extending the custom user matrix. Holds many-to-many relationship mappings to track a `listens_to` history. Replaces the older separate Artist/Enjoyer paradigms so anyone can act as a creator.
-- **`Song`**: The core data object tied directly to the `User` framework who generated it. Includes metadata like tags, genre, description, and status.
-- **`ShareLink`**: External links carrying specific user permissions (view, download, share forward) for shared interactions.
+- **`User`**: Represents an authenticated application user. A user can generate songs and maintain a personal song library through the `listens_to` many-to-many relationship. This supports the current design where a user can act as both creator and listener.
+
+- **`Song`**: The central music object. It stores song metadata such as `title`, `genre`, and `description`, along with generation fields such as `generation_method`, `task_id`, `gen_status`, and `gen_status_result`.
+
+  The song supports both external API generation and MOCK generation:
+
+  - `generation_method='suno'`: The polling service checks Suno using `task_id`, reads the API status, downloads the completed audio, saves it into `audio_file`, and marks the song as `done`.
+  - `generation_method='mock'`: The polling service skips the Suno API, downloads the predefined `audio_url`, saves it into `audio_file`, and marks the song as `done`.
+
+  The model also keeps both:
+  - `audio_url`: the original remote audio source
+  - `audio_file`: the locally saved/downloaded audio file used by the app player
+
+- **`ShareLink`**: Planned sharing model for external access. It links a song to a creator and stores permission flags such as `can_view`, `can_download`, and `can_share_forward`. This supports the future shareable-link feature.
 
 ## MVC / MVT Diagram
 
