@@ -127,9 +127,9 @@ flowchart LR
    TFORM <--> |Share Link Form| VSH 
 
    %% Template composition
-   TL <-- TF
-   TL <-- TLP
-   TB <-- TP
+   TF --> TL
+   TLP --> TL
+   TP --> TB
 
    %% Color coding: M / V / T (+ routes)
    classDef route fill:#1f2937,stroke:#9ca3af,color:#f9fafb,stroke-width:1px;
