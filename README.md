@@ -76,23 +76,23 @@ This project completely drops monolithic structures by separating logic into two
 ```mermaid
 flowchart LR
    %% Route Layer
-   U[frontend/urls.py]\nRoutes
+   U["frontend/urls.py<br/>Routes"]
 
    %% View/Controller Layer
-   VB[views/base.py\nindex, popup_callback, dev_login, serve_audio]
-   VS[views/songs.py\nSongList/Create/Update/Delete\nSongCallback]
-   VU[views/users.py\nUser CRUD Views]
-   VSH[views/shares.py\nShareLink CRUD Views]
+   VB["views/base.py<br/>index, popup_callback, dev_login, serve_audio"]
+   VS["views/songs.py<br/>SongList/Create/Update/Delete<br/>SongCallback"]
+   VU["views/users.py<br/>User CRUD Views"]
+   VSH["views/shares.py<br/>ShareLink CRUD Views"]
 
    %% Model Layer
-   MU[backend/models/user_model.py\nUser]
-   MS[backend/models/song_model.py\nSong]
-   MSL[backend/models/share_model.py\nShareLink]
+   MU["backend/models/user_model.py<br/>User"]
+   MS["backend/models/song_model.py<br/>Song"]
+   MSL["backend/models/share_model.py<br/>ShareLink"]
 
    %% Template Layer
-   TB[templates/base.html\nLayout + SPA navigation]
-   TP[templates/components/player.html\nGlobal audio player]
-   TF[templates/components/filter_sort.html\nSearch/Sort AJAX]
+   TB["templates/base.html<br/>Layout + SPA navigation"]
+   TP["templates/components/player.html<br/>Global audio player"]
+   TF["templates/components/filter_sort.html<br/>Search/Sort AJAX"]
    TL[templates/songs/list.html]
    TLP[templates/songs/partials/song_list.html]
    TFORM[templates/common/form.html]
