@@ -1,8 +1,6 @@
-# Chithara AI Music Generator - Web Application
+## Introduction
 
-This repository contains the fully built, consolidated web application for the Chithara AI Music Generator. It is cleanly separated into two distinct Django apps: `frontend` (managing templates, UI, and views) and `backend` (managing all database models and schemas).
-
-admin url
+Chithara AI Music Generator is a web application that allows users to generate, manage, and play AI-created music tracks. It supports both real API-based generation (Suno) and a mock mode for fast testing, enabling a smooth development and demonstration experience. Users can build a personal music library, search and sort songs dynamically, and play tracks with a real-time visualizer, all within a responsive and modern interface.
 
 features:
 - User Authentication via Google OAuth
@@ -13,7 +11,6 @@ features:
 - Pseudo random gredient for song based on id for unique visual
 - song player with real-time visualizer
 - CRUD operations for songs with dynamic search and sorting capabilities
-- 
 
 TODO:
 - Shareable links with granular permissions (view, download, share forward)
