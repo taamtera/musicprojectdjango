@@ -90,6 +90,8 @@ class SongCreateView(LoginRequiredMixin, CreateView):
 
     def _call_mock_api(self, song):
         """Simulate an API call with a mock response."""
+        import secrets
+        song.task_id = f"mock{secrets.token_hex(16)}" 
         song.gen_status = 'in-progress'
         song.audio_url = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3"
         # In a real app, you might use a task queue like Celery for this

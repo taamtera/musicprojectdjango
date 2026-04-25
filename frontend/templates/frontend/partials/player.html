@@ -1,0 +1,65 @@
+<div id="footer-player" class="w-full max-w-4xl mx-auto flex items-center gap-4 p-4 glass-panel border border-white/10 rounded-2xl shadow-2xl transition-all duration-500">
+    <!-- Song Info -->
+    <div class="flex items-center gap-3 w-48 shrink-0">
+        <div id="player-icon" class="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center text-slate-600 shadow-lg transition-all duration-500">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+            </svg>
+        </div>
+        <div class="truncate">
+            <div id="footer-player-title" class="text-sm font-bold text-slate-500 truncate">No track selected</div>
+            <div id="footer-player-genre" class="text-[10px] text-slate-600 truncate">Choose a song to start playing</div>
+        </div>
+    </div>
+
+    <!-- Player Controls -->
+    <div class="flex-grow flex items-center gap-4 bg-black/20 rounded-xl px-4 py-2 border border-white/5">
+        <audio id="global-audio" class="w-full h-8" style="filter: invert(1) hue-rotate(180deg); opacity: 0.5;"></audio>
+    </div>
+
+    <!-- Branding -->
+    <div class="w-32 shrink-0 text-right">
+        <p class="text-[10px] font-bold text-slate-500 tracking-tighter transition-colors duration-500" id="branding-title">CHITHARA AI</p>
+        <p class="text-[8px] text-slate-600 uppercase">© 2026 Generator</p>
+    </div>
+</div>
+
+<script>
+    const footerPlayer = document.getElementById('footer-player');
+    const globalAudio = document.getElementById('global-audio');
+    const playerTitle = document.getElementById('footer-player-title');
+    const playerGenre = document.getElementById('footer-player-genre');
+    const playerIcon = document.getElementById('player-icon');
+    const brandingTitle = document.getElementById('branding-title');
+
+    function playSong(url, title, genre, cardId) {
+        if (!url) return;
+
+        // Update UI Text
+        playerTitle.textContent = title;
+        playerGenre.textContent = genre;
+        
+        // Update Styles to "Active" state
+        playerTitle.classList.remove('text-slate-500');
+        playerTitle.classList.add('text-white');
+        playerGenre.classList.remove('text-slate-600');
+        playerGenre.classList.add('text-slate-400');
+        
+        playerIcon.classList.remove('bg-slate-800', 'text-slate-600');
+        playerIcon.classList.add('bg-gradient-to-br', 'from-purple-500', 'to-blue-500', 'text-white', 'pulse-ring');
+        
+        brandingTitle.classList.remove('text-slate-500');
+        brandingTitle.classList.add('text-purple-400');
+
+        globalAudio.style.opacity = "1";
+        globalAudio.src = url;
+        globalAudio.play();
+
+        // Highlight card
+        document.querySelectorAll('.song-card').forEach(c => c.classList.remove('border-purple-500', 'bg-purple-900/10'));
+        const activeCard = document.getElementById(cardId);
+        if (activeCard) {
+            activeCard.classList.add('border-purple-500', 'bg-purple-900/10');
+        }
+    }
+</script>

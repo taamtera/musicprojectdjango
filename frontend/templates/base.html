@@ -92,14 +92,101 @@
     {% endif %}
 
     <!-- Main Content -->
-    <main class="flex-grow container mx-auto px-4 py-8">
-        {% block content %}{% endblock %}
-    </main>
+    <div id="app-content-wrapper">
+        <main class="flex-grow container mx-auto px-4 py-8" id="app-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
 
-    <!-- Footer -->
-    <footer class="mt-auto py-6 text-center text-slate-400 glass-panel m-4">
-        <p>&copy; 2026 Chithara AI Music Generator</p>
+    <!-- Global Footer Player -->
+    <footer class="fixed bottom-6 left-0 w-full px-4 z-50">
+        {% include "frontend/partials/player.html" %}
     </footer>
+
+    <script>
+        // SPA Navigation Logic to keep music persistent
+        async function navigate(url, pushState = true) {
+            try {
+                const response = await fetch(url);
+                const html = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                
+                // Swap only the main content area
+                const newContent = doc.querySelector('#app-content');
+                if (newContent) {
+                    document.querySelector('#app-content').innerHTML = newContent.innerHTML;
+                    
+                    // Update metadata
+                    document.title = doc.title;
+                    if (pushState) history.pushState({ url }, doc.title, url);
+                    
+                    // Scroll to top
+                    window.scrollTo(0, 0);
+                    
+                    // Check if we are on a page that should hide the player
+                    updatePlayerVisibility();
+                }
+            } catch (err) {
+                console.error('SPA navigation failed, falling back to full reload:', err);
+                if (pushState) window.location.href = url;
+            }
+        }
+
+        // Check if player should be hidden based on current path
+        function updatePlayerVisibility() {
+            const path = window.location.pathname;
+            const hidePaths = ['/', '/songs/create/'];
+            const shouldHide = hidePaths.includes(path);
+            
+            const player = document.getElementById('footer-player');
+            const audio = document.getElementById('global-audio');
+            
+            if (shouldHide) {
+                audio.pause();
+                player.classList.add('opacity-0', 'invisible', 'translate-y-4', 'pointer-events-none');
+                player.classList.remove('opacity-100', 'visible', 'translate-y-0', 'pointer-events-auto');
+            } else {
+                player.classList.remove('opacity-0', 'invisible', 'translate-y-4', 'pointer-events-none');
+                player.classList.add('opacity-100', 'visible', 'translate-y-0', 'pointer-events-auto');
+            }
+        }
+
+        // Run on initial load and navigation
+        document.addEventListener('DOMContentLoaded', updatePlayerVisibility);
+
+        // Intercept all internal links
+        document.addEventListener('click', e => {
+            const link = e.target.closest('a');
+            if (link && 
+                link.href && 
+                link.href.startsWith(window.location.origin) && 
+                !link.hasAttribute('download') &&
+                link.target !== '_blank' &&
+                !link.getAttribute('href').startsWith('#')) {
+                
+                e.preventDefault();
+                navigate(link.href);
+            }
+        });
+
+        // Handle back/forward buttons
+        window.addEventListener('popstate', e => {
+            if (e.state && e.state.url) {
+                navigate(e.state.url, false);
+            } else {
+                window.location.reload();
+            }
+        });
+
+        // Profile dropdown logic
+        document.addEventListener('click', function(e) {
+            const widget = document.getElementById('profile-widget');
+            if (widget && !widget.contains(e.target)) {
+                widget.classList.remove('open');
+            }
+        });
+    </script>
 </body>
 
 </html>
