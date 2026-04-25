@@ -71,6 +71,14 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(res => res.json())
         .then(data => {
             results.innerHTML = data.html;
+
+            if (typeof initializeSongGradients === 'function') {
+                initializeSongGradients(results);
+            }
+            if (typeof initializeSongDurations === 'function') {
+                initializeSongDurations(results);
+            }
+
             sortSelect.value = currentSort;
             history.replaceState(null, '', '?' + params.toString());
         })

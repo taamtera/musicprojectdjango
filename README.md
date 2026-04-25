@@ -2,6 +2,20 @@
 
 This repository contains the fully built, consolidated web application for the Chithara AI Music Generator. It is cleanly separated into two distinct Django apps: `frontend` (managing templates, UI, and views) and `backend` (managing all database models and schemas).
 
+admin url
+
+features:
+- User Authentication via Google OAuth
+- Developer Bypass for instant login and testing (TA please use this one)
+- Polymorphic Song Generation with support for multiple APIs (currently Suno API) and MOCK mode for testing without API calls (set during song generation)
+- Song generation polled every 10 seconds to check for completion and log updates in terminal (check terminal for progress)
+- song player with real-time visualizer
+- CRUD operations for songs with dynamic search and sorting capabilities
+- 
+
+TODO:
+- Shareable links with granular permissions (view, download, share forward)
+- Libary of songs shared by other users.
 ## Project Setup
 
 ### Prerequisites
@@ -24,6 +38,7 @@ This repository contains the fully built, consolidated web application for the C
 4. **Environment Configuration**:
    - Rename `.env.example` (if provided) or create a file named `.env` in the root directory.
    - Add your Suno API token: `SUNO_API_TOKEN=your_token_here`
+   - The MOCK/API stradegy is set in application when generating songs to support mulitple apis in the future.
 5. Run the database migrations:
    ```bash
    python manage.py migrate

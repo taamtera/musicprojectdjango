@@ -178,7 +178,7 @@ class SongCreateView(LandingLoginRequiredMixin, CreateView):
 
 class SongUpdateView(LandingLoginRequiredMixin, UpdateView):
     model = Song
-    fields = ['title', 'genre', 'description', 'gen_status', 'gen_status_result', 'audio_url', 'task_id']
+    fields = ['title', 'genre', 'description']
     template_name = 'common/form.html'
     success_url = reverse_lazy('song-list')
 

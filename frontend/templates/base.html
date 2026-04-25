@@ -45,6 +45,112 @@
     </footer>
 
     <script>
+        const songDurationCache = {};
+        function hashSeed(text) {
+            // xmur3 string hash to seed deterministic PRNG.
+            let h = 1779033703 ^ String(text || '0').length;
+            const seed = String(text || '0');
+            for (let i = 0; i < seed.length; i++) {
+                h = Math.imul(h ^ seed.charCodeAt(i), 3432918353);
+                h = (h << 13) | (h >>> 19);
+            }
+            return function() {
+                h = Math.imul(h ^ (h >>> 16), 2246822507);
+                h = Math.imul(h ^ (h >>> 13), 3266489909);
+                return (h ^= h >>> 16) >>> 0;
+            };
+        }
+
+        function createSeededRandom(seedText) {
+            // mulberry32 PRNG for repeatable random values per song id.
+            const seedFn = hashSeed(seedText);
+            let state = seedFn();
+            return function() {
+                state += 0x6D2B79F5;
+                let t = state;
+                t = Math.imul(t ^ (t >>> 15), t | 1);
+                t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+                return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+            };
+        }
+
+        function randomInRange(rand, min, max) {
+            return min + rand() * (max - min);
+        }
+
+        function buildSeededGradient(seed) {
+            const rand = createSeededRandom(seed);
+
+            const angle = Math.floor(randomInRange(rand, 90, 200));
+
+            const h1 = Math.floor(randomInRange(rand, 0, 360));
+            const h2 = (h1 + Math.floor(randomInRange(rand, 70, 170))) % 360;
+
+            const s1 = Math.floor(randomInRange(rand, 62, 88));
+            const s2 = Math.floor(randomInRange(rand, 58, 86));
+
+            const l1 = Math.floor(randomInRange(rand, 44, 62));
+            const l2 = Math.floor(randomInRange(rand, 38, 58));
+
+            const a1 = randomInRange(rand, 0.12, 0.20).toFixed(3);
+            const a2 = randomInRange(rand, 0.14, 0.24).toFixed(3);
+
+            const c1 = `hsla(${h1}, ${s1}%, ${l1}%, ${a1})`;
+            const c2 = `hsla(${h2}, ${s2}%, ${l2}%, ${a2})`;
+
+            return `linear-gradient(${angle}deg, ${c1} 0%, ${c2} 100%)`;
+        }
+
+        function initializeSongGradients(root = document) {
+            const nodes = root.querySelectorAll('.js-seeded-gradient[data-song-seed]');
+            nodes.forEach(node => {
+                const seed = node.dataset.songSeed;
+                node.style.background = buildSeededGradient(seed);
+                node.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+            });
+        }
+
+        function formatDuration(seconds) {
+            if (!Number.isFinite(seconds) || seconds < 0) return '--:--';
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function initializeSongDurations(root = document) {
+            const durationNodes = root.querySelectorAll('.js-song-duration[data-audio-src]');
+
+            durationNodes.forEach(node => {
+                const src = node.dataset.audioSrc;
+                if (!src) {
+                    node.textContent = '--:--';
+                    return;
+                }
+
+                if (songDurationCache[src]) {
+                    node.textContent = songDurationCache[src];
+                    return;
+                }
+
+                const probe = new Audio();
+                probe.preload = 'metadata';
+                probe.crossOrigin = 'anonymous';
+
+                probe.addEventListener('loadedmetadata', () => {
+                    const duration = formatDuration(probe.duration);
+                    songDurationCache[src] = duration;
+                    node.textContent = duration;
+                }, { once: true });
+
+                probe.addEventListener('error', () => {
+                    songDurationCache[src] = '--:--';
+                    node.textContent = '--:--';
+                }, { once: true });
+
+                probe.src = src;
+            });
+        }
+
         // SPA Navigation Logic to keep music persistent
         async function navigate(url, pushState = true) {
             try {
@@ -67,6 +173,8 @@
                     
                     // Check if we are on a page that should hide the player
                     updatePlayerVisibility();
+                    initializeSongGradients(document.querySelector('#app-content'));
+                    initializeSongDurations(document.querySelector('#app-content'));
                 }
             } catch (err) {
                 console.error('SPA navigation failed, falling back to full reload:', err);
@@ -78,7 +186,10 @@
         function updatePlayerVisibility() {
             const path = window.location.pathname;
             const hidePaths = ['/', '/songs/create/'];
-            const shouldHide = hidePaths.includes(path);
+            const hidePatterns = [
+                /^\/songs\/[^/]+\/update\/$/
+            ];
+            const shouldHide = hidePaths.includes(path) || hidePatterns.some(pattern => pattern.test(path));
             
             const player = document.getElementById('footer-player');
             const audio = document.getElementById('global-audio');
@@ -97,7 +208,11 @@
         }
 
         // Run on initial load and navigation
-        document.addEventListener('DOMContentLoaded', updatePlayerVisibility);
+        document.addEventListener('DOMContentLoaded', () => {
+            updatePlayerVisibility();
+            initializeSongGradients(document.querySelector('#app-content'));
+            initializeSongDurations(document.querySelector('#app-content'));
+        });
 
         // Intercept all internal links
         document.addEventListener('click', e => {

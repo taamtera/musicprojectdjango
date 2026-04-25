@@ -1,11 +1,11 @@
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     {% for song in object_list %}
-    <div id="song-card-{{ forloop.counter }}" class="glass-panel song-card p-5 group hover:border-purple-500/50 transition-all duration-300 relative overflow-hidden flex flex-col {% if song.audio_url or song.audio_file %}cursor-pointer hover:bg-slate-800/50{% endif %}"
+    <div id="song-card-{{ forloop.counter }}" data-song-seed="{{ song.pk }}" class="glass-panel song-card js-seeded-gradient p-5 group hover:border-purple-500/50 transition-all duration-300 relative overflow-hidden flex flex-col {% if song.audio_url or song.audio_file %}cursor-pointer hover:bg-slate-800/50{% endif %}"
          {% if song.audio_url or song.audio_file %}onclick="playSong('{% if song.audio_file %}{{ song.audio_file.url }}{% else %}{{ song.audio_url }}{% endif %}', '{{ song.title|escapejs }}', '{{ song.genre|escapejs }}', 'song-card-{{ forloop.counter }}')"{% endif %}>
 
         <div class="absolute top-4 right-4">
             <span class="px-2 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold
-                {% if song.gen_status == 'done' %}bg-green-900/40 text-green-400 border border-green-700/50
+                {% if song.gen_status == 'done' %}bg-slate-800/50 text-slate-300 border border-slate-600/40
                 {% elif song.gen_status == 'failed' %}bg-red-900/40 text-red-400 border border-red-700/50
                 {% else %}bg-blue-900/40 text-blue-400 border border-blue-700/50{% endif %}">
                 {{ song.gen_status }}
@@ -16,7 +16,12 @@
             <h3 class="text-xl font-bold text-white group-hover:text-purple-400 transition-colors truncate pr-16">
                 {{ song.title }}
             </h3>
-            <p class="text-slate-400 text-sm mt-1">{{ song.genre }}</p>
+            
+
+            <span class="text-slate-200 text-sm mt-1">{{ song.genre }} - </span>
+            {% if song.audio_url or song.audio_file %}
+                <span class="text-slate-400 js-song-duration" data-audio-src="{% if song.audio_file %}{{ song.audio_file.url }}{% else %}{{ song.audio_url }}{% endif %}">--:--</span>
+            {% endif %}
         </div>
 
         <div class="flex-grow mb-4">
