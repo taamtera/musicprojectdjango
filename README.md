@@ -116,8 +116,9 @@ flowchart LR
    MSL -->|creator FK| MU
 
    %% Template to views
+   TL --> VS
    TINDEX --> VB 
-   TB --> VS  
+   TB --> VB  
    TFORM <--> |Generate Song Form| VS 
    TFORM <--> |Login/Registration Form| VU 
    TFORM <--> |Share Link Form| VSH 
@@ -125,8 +126,7 @@ flowchart LR
    %% Template composition
    TF --> TL
    TLP --> TL
-   TP --> TB
-   TL --> TB  
+   TP --> TB  
 
    %% Color coding: M / V / T (+ routes)
    classDef route fill:#1f2937,stroke:#9ca3af,color:#f9fafb,stroke-width:1px;
