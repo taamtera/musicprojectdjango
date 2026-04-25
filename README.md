@@ -9,7 +9,7 @@ features:
 - MOCK mode simulates in-progress processing with a 10-second delay before marking the song done
 - SUNO MODE Song generation polled every 10 seconds to check for completion and log updates in terminal (check terminal for progress)
 - Pseudo random gredient for song based on id for unique visual
-- song player with real-time visualizer
+- Persistent song playback with real-time visualizer
 - CRUD operations for songs with dynamic search and sorting capabilities
 
 TODO:
