@@ -31,19 +31,12 @@
             <p class="text-slate-400 text-sm mt-1">{{ song.genre }}</p>
         </div>
 
-        <!-- Content Container -->
-        <div class="flex-grow flex items-center justify-center mb-4">
-            {% if song.audio_url or song.audio_file %}
-            <div class="flex flex-col items-center gap-3 text-purple-400 group-hover:text-purple-300 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                </svg>
-            </div>
+        <!-- Description -->
+        <div class="flex-grow mb-4">
+            {% if song.description %}
+            <p class="text-slate-400 text-sm leading-relaxed line-clamp-3">{{ song.description }}</p>
             {% else %}
-            <div class="flex flex-col items-center gap-2 text-slate-500 text-xs italic">
-                <div class="w-8 h-8 border-2 border-slate-700 border-t-purple-500 rounded-full animate-spin"></div>
-                <span>Generating...</span>
-            </div>
+            <p class="text-slate-500 text-sm italic">No description provided</p>
             {% endif %}
         </div>
 

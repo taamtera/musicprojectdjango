@@ -1,4 +1,5 @@
-<div id="footer-player" class="w-full max-w-6xl mx-auto flex items-center gap-4 p-4 glass-panel border border-white/10 rounded-2xl shadow-2xl transition-all duration-500">
+<div id="footer-player" class="w-full max-w-6xl mx-auto flex items-center justify-between gap-4 p-4 glass-panel border border-white/10 rounded-2xl shadow-2xl transition-all duration-500">
+    
     <!-- Song Info -->
     <div class="flex items-center gap-3 w-48 shrink-0">
         <div id="player-icon" class="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center text-slate-600 shadow-lg transition-all duration-500">
@@ -12,142 +13,133 @@
         </div>
     </div>
 
-    <!-- Player Controls -->
-    <div class="flex-grow flex flex-col gap-2">
-        <!-- Play/Pause and Progress -->
-        <div class="flex items-center gap-3">
-            <!-- Play/Pause Button -->
-            <button id="play-pause-btn" class="w-8 h-8 bg-purple-600 hover:bg-purple-500 text-white rounded-full flex items-center justify-center transition-colors flex-shrink-0" onclick="togglePlayPause()">
-                <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                </svg>
-                <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 hidden" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
-                </svg>
-            </button>
-
-            <!-- Progress Bar -->
-            <div class="flex-grow flex items-center gap-2">
-                <span id="current-time" class="text-[10px] text-slate-500 w-10 text-right">0:00</span>
-                <input type="range" id="progress-bar" min="0" max="100" value="0" class="flex-grow h-1 bg-slate-700 rounded-full appearance-none cursor-pointer" style="accent-color: #a855f7;">
-                <span id="duration-time" class="text-[10px] text-slate-500 w-10">0:00</span>
-            </div>
-        </div>
-
-        <!-- Volume Control -->
-        <div class="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-500 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M13.5 4.06c0-1.336-1.616-2.256-2.73-1.72l-5.24 3.02C5.1 5.395 4.3 6.25 4.3 7.26v9.48c0 1.01.8 1.865 1.73 2.12l5.24 3.02c1.11.536 2.73-.384 2.73-1.72V4.06zM5.84 15.36a2 2 0 0 1-.5-1.34V7.5H7v8.5H5.84z"/>
+    <!-- Controls -->
+    <div class="flex-grow flex items-center gap-3">
+        <button id="play-pause-btn" class="w-10 h-10 bg-purple-600 hover:bg-purple-500 text-white rounded-full flex items-center justify-center transition-colors flex-shrink-0" onclick="togglePlayPause()">
+            <svg id="play-icon" class="h-5 w-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
             </svg>
-            <input type="range" id="volume-slider" min="0" max="100" value="70" class="w-20 h-1 bg-slate-700 rounded-full appearance-none cursor-pointer" style="accent-color: #a855f7;">
+            <svg id="pause-icon" class="h-5 w-5 hidden" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z" />
+            </svg>
+        </button>
+
+        <div class="flex-grow flex items-center gap-2">
+            <span id="current-time" class="text-[10px] text-slate-500 w-10 text-right">0:00</span>
+            <input type="range" id="progress-bar" min="0" max="100" value="0"
+                class="flex-grow h-2 bg-slate-700 rounded-full appearance-none cursor-pointer hover:bg-slate-600 transition-colors"
+                style="accent-color: #a855f7;">
+            <span id="duration-time" class="text-[10px] text-slate-500 w-10">0:00</span>
         </div>
     </div>
 
-    <!-- Hidden Audio Element -->
-    <audio id="global-audio"></audio>
+    <!-- Volume -->
+    <div class="flex items-center gap-2 w-40 shrink-0">
+        <svg class="h-4 w-4 text-slate-500" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M13.5 4.06c0-1.336-1.616-2.256-2.73-1.72l-5.24 3.02C5.1 5.395 4.3 6.25 4.3 7.26v9.48c0 1.01.8 1.865 1.73 2.12l5.24 3.02c1.11.536 2.73-.384 2.73-1.72V4.06z"/>
+        </svg>
+        <input type="range" id="volume-slider" min="0" max="100" value="70"
+            class="flex-grow h-1 bg-slate-700 rounded-full appearance-none cursor-pointer hover:bg-slate-600 transition-colors"
+            style="accent-color: #a855f7;">
+    </div>
 
     <!-- Branding -->
     <div class="w-32 shrink-0 text-right">
-        <p class="text-[10px] font-bold text-slate-500 tracking-tighter transition-colors duration-500" id="branding-title">CHITHARA AI</p>
+        <p id="branding-title" class="text-[10px] font-bold text-slate-500">CHITHARA AI</p>
         <p class="text-[8px] text-slate-600 uppercase">© 2026 Generator</p>
     </div>
+
+    <audio id="global-audio" crossorigin="anonymous"></audio>
 </div>
 
 <script>
-    const footerPlayer = document.getElementById('footer-player');
-    const globalAudio = document.getElementById('global-audio');
-    const playerTitle = document.getElementById('footer-player-title');
-    const playerGenre = document.getElementById('footer-player-genre');
-    const playerIcon = document.getElementById('player-icon');
-    const brandingTitle = document.getElementById('branding-title');
-    const playPauseBtn = document.getElementById('play-pause-btn');
-    const playIcon = document.getElementById('play-icon');
-    const pauseIcon = document.getElementById('pause-icon');
-    const progressBar = document.getElementById('progress-bar');
-    const currentTimeEl = document.getElementById('current-time');
-    const durationTimeEl = document.getElementById('duration-time');
-    const volumeSlider = document.getElementById('volume-slider');
+const globalAudio = document.getElementById('global-audio');
+const playerTitle = document.getElementById('footer-player-title');
+const playerGenre = document.getElementById('footer-player-genre');
+const playerIcon = document.getElementById('player-icon');
+const brandingTitle = document.getElementById('branding-title');
+const playIcon = document.getElementById('play-icon');
+const pauseIcon = document.getElementById('pause-icon');
+const progressBar = document.getElementById('progress-bar');
+const currentTimeEl = document.getElementById('current-time');
+const durationTimeEl = document.getElementById('duration-time');
+const volumeSlider = document.getElementById('volume-slider');
 
-    // Format time in MM:SS
-    function formatTime(seconds) {
-        if (!seconds || isNaN(seconds)) return '0:00';
-        const mins = Math.floor(seconds / 60);
-        const secs = Math.floor(seconds % 60);
-        return `${mins}:${secs.toString().padStart(2, '0')}`;
+let isSeeking = false;
+
+function formatTime(seconds) {
+    if (!seconds || isNaN(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+function togglePlayPause() {
+    globalAudio.paused ? globalAudio.play() : globalAudio.pause();
+}
+
+globalAudio.addEventListener('play', () => {
+    playIcon.classList.add('hidden');
+    pauseIcon.classList.remove('hidden');
+});
+
+globalAudio.addEventListener('pause', () => {
+    playIcon.classList.remove('hidden');
+    pauseIcon.classList.add('hidden');
+});
+
+// Update progress normally
+globalAudio.addEventListener('timeupdate', () => {
+    if (globalAudio.duration) {
+        progressBar.value = (globalAudio.currentTime / globalAudio.duration) * 100;
     }
+    currentTimeEl.textContent = formatTime(globalAudio.currentTime);
+});
 
-    // Toggle play/pause
-    function togglePlayPause() {
-        if (globalAudio.paused) {
-            globalAudio.play();
-        } else {
-            globalAudio.pause();
-        }
-    }
+// Set duration
+globalAudio.addEventListener('loadedmetadata', () => {
+    durationTimeEl.textContent = formatTime(globalAudio.duration);
+});
 
-    // Update play/pause icon
-    globalAudio.addEventListener('play', () => {
-        playIcon.classList.add('hidden');
-        pauseIcon.classList.remove('hidden');
-    });
+// ✅ Smooth seeking (no flags, no reset bug)
+progressBar.addEventListener('input', () => {
+    if (!globalAudio.duration) return;
 
-    globalAudio.addEventListener('pause', () => {
-        playIcon.classList.remove('hidden');
-        pauseIcon.classList.add('hidden');
-    });
+    const newTime = (progressBar.value / 100) * globalAudio.duration;
+    globalAudio.currentTime = newTime;
 
-    // Update progress bar and time
-    globalAudio.addEventListener('timeupdate', () => {
-        const percent = (globalAudio.currentTime / globalAudio.duration) * 100;
-        progressBar.value = percent;
-        currentTimeEl.textContent = formatTime(globalAudio.currentTime);
-    });
+    // Update UI instantly while dragging
+    currentTimeEl.textContent = formatTime(newTime);
+});
 
-    // Update duration
-    globalAudio.addEventListener('loadedmetadata', () => {
-        durationTimeEl.textContent = formatTime(globalAudio.duration);
-    });
-
-    // Seek to position
-    progressBar.addEventListener('input', () => {
-        globalAudio.currentTime = (progressBar.value / 100) * globalAudio.duration;
-    });
-
-    // Volume control
-    volumeSlider.addEventListener('input', () => {
-        globalAudio.volume = volumeSlider.value / 100;
-    });
-
-    // Set initial volume
+volumeSlider.addEventListener('input', () => {
     globalAudio.volume = volumeSlider.value / 100;
+});
 
-    function playSong(url, title, genre, cardId) {
-        if (!url) return;
+globalAudio.volume = volumeSlider.value / 100;
 
-        // Update UI Text
-        playerTitle.textContent = title;
-        playerGenre.textContent = genre;
-        
-        // Update Styles to "Active" state
-        playerTitle.classList.remove('text-slate-500');
-        playerTitle.classList.add('text-white');
-        playerGenre.classList.remove('text-slate-600');
-        playerGenre.classList.add('text-slate-400');
-        
-        playerIcon.classList.remove('bg-slate-800', 'text-slate-600');
-        playerIcon.classList.add('bg-gradient-to-br', 'from-purple-500', 'to-blue-500', 'text-white', 'pulse-ring');
-        
-        brandingTitle.classList.remove('text-slate-500');
-        brandingTitle.classList.add('text-purple-400');
+function playSong(url, title, genre, cardId) {
+    if (!url) return;
 
-        globalAudio.src = url;
-        globalAudio.play();
+    playerTitle.textContent = title;
+    playerGenre.textContent = genre;
 
-        // Highlight card
-        document.querySelectorAll('.song-card').forEach(c => c.classList.remove('border-purple-500', 'bg-purple-900/10'));
-        const activeCard = document.getElementById(cardId);
-        if (activeCard) {
-            activeCard.classList.add('border-purple-500', 'bg-purple-900/10');
-        }
+    playerTitle.classList.replace('text-slate-500', 'text-white');
+    playerGenre.classList.replace('text-slate-600', 'text-slate-400');
+
+    playerIcon.className = "w-10 h-10 rounded-lg flex items-center justify-center text-white shadow-lg bg-gradient-to-br from-purple-500 to-blue-500 pulse-ring";
+
+    brandingTitle.classList.replace('text-slate-500', 'text-purple-400');
+
+    globalAudio.src = url;
+    globalAudio.play();
+
+    document.querySelectorAll('.song-card')
+        .forEach(c => c.classList.remove('border-purple-500', 'bg-purple-900/10'));
+
+    const activeCard = document.getElementById(cardId);
+    if (activeCard) {
+        activeCard.classList.add('border-purple-500', 'bg-purple-900/10');
     }
+}
 </script>

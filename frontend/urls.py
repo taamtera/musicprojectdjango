@@ -6,6 +6,9 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('popup-callback/', views.popup_callback, name='popup-callback'),
     path('dev-login/', views.dev_login, name='dev-login'),
+    
+    # Audio serving with range request support
+    path('media/songs/<str:filename>', views.serve_audio, name='serve-audio'),
 
     # Users
     path('users/', views.UserListView.as_view(), name='user-list'),

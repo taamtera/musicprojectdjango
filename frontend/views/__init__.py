@@ -1,4 +1,4 @@
-from .base import index, popup_callback, dev_login
+from .base import index, popup_callback, dev_login, serve_audio
 from .users import (
     UserListView, UserCreateView, UserUpdateView, UserDeleteView
 )
