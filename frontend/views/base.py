@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
-from backend.models import User
+from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.http import FileResponse, HttpResponse
 from django.conf import settings
@@ -15,14 +15,31 @@ def popup_callback(request):
 
 def dev_login(request):
     """Automatically log in as the test user for development."""
-    try:
-        user = User.objects.get(username='testuser')
-        login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-        messages.success(request, f"Bypass successful! Logged in as {user.username}")
-    except User.DoesNotExist:
-        messages.error(request, "Test user not found. Please run migrations.")
+    if not settings.DEBUG:
+        messages.error(request, "Developer bypass is only available in debug mode.")
+        return redirect('song-list')
+
+    User = get_user_model()
+    candidates = User.objects.filter(username='testuser')
+    user = candidates.first()
+
+    if user is None:
+        user = User.objects.create(
+            username='testuser',
+            email='test@example.com',
+            name='Test User',
+            is_staff=True,
+        )
+        user.set_unusable_password()
+        user.save(update_fields=['password'])
+        messages.info(request, "Created missing test user automatically.")
+    elif candidates.count() > 1:
+        messages.warning(request, "Multiple test users found. Signed in with the first match.")
+
+    login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+    messages.success(request, f"Bypass successful! Logged in as {user.username}")
     
-    return redirect('index')
+    return redirect('song-list')
 
 def serve_audio(request, filename):
     """Serve audio files with range request support for seeking."""

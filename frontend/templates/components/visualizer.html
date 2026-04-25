@@ -1,0 +1,135 @@
+<div class="absolute inset-0 z-0 pointer-events-none overflow-hidden rounded-2xl" aria-hidden="true">
+    <canvas id="player-visualizer-canvas" class="w-full h-full opacity-80"></canvas>
+    <div class="absolute inset-0 bg-gradient-to-r from-slate-900/60 via-slate-900/20 to-slate-900/60"></div>
+</div>
+<script>
+(function () {
+    const visualizerCanvas = document.getElementById('player-visualizer-canvas');
+    const visualizerCtx = visualizerCanvas ? visualizerCanvas.getContext('2d') : null;
+
+    let audioContext = null;
+    let sourceNode = null;
+    let channelSplitter = null;
+    let leftAnalyser = null;
+    let rightAnalyser = null;
+    let mediaSource = null;
+    let visualizerAnimationId = null;
+
+    function getAudio() {
+        return document.getElementById('global-audio');
+    }
+
+    function resizeVisualizerCanvas() {
+        if (!visualizerCanvas) return;  
+
+        const ratio = window.devicePixelRatio || 1;
+        const rect = visualizerCanvas.getBoundingClientRect();
+
+        visualizerCanvas.width = Math.max(1, Math.floor(rect.width * ratio));
+        visualizerCanvas.height = Math.max(1, Math.floor(rect.height * ratio));
+    }
+
+    function drawVisualizer() {
+        const globalAudio = getAudio();
+
+        if (!visualizerCtx || !visualizerCanvas || !leftAnalyser || !rightAnalyser || !globalAudio) return;
+
+        const width = visualizerCanvas.width;
+        const height = visualizerCanvas.height;
+        const barGap = 2;
+        const sideWidth = 0
+        const barWidth = 10;
+        const barsPerSide = width / 2 / (barWidth + barGap);
+        const totalBarsWidth = barsPerSide * barWidth + (barsPerSide - 1) * barGap;
+        const verticalPadding = 10;
+        const baseY = height - verticalPadding;
+
+        const leftData = new Uint8Array(leftAnalyser.frequencyBinCount);
+        const rightData = new Uint8Array(rightAnalyser.frequencyBinCount);
+
+        leftAnalyser.getByteFrequencyData(leftData);
+        rightAnalyser.getByteFrequencyData(rightData);
+
+        visualizerCtx.clearRect(0, 0, width, height);
+
+        const gradient = visualizerCtx.createLinearGradient(0, 0, 0, height);
+        gradient.addColorStop(0, 'rgba(168, 85, 247, 0.92)');
+        gradient.addColorStop(0.55, 'rgba(96, 165, 250, 0.72)');
+        gradient.addColorStop(1, 'rgba(15, 23, 42, 0.08)');
+        visualizerCtx.fillStyle = gradient;
+
+        const leftStep = Math.max(1, Math.floor(leftData.length / barsPerSide));
+        const rightStep = Math.max(1, Math.floor(rightData.length / barsPerSide));
+        const minBar = globalAudio.paused ? 3 : 5;
+        const maxBarHeight = height * 0.78;
+        const leftStartX = 10;
+        const rightStartX = width - 10 - totalBarsWidth;
+
+        for (let i = 0; i < barsPerSide; i++) {
+            const leftValue = leftData[i * leftStep] / 255;
+            const rightValue = rightData[i * rightStep] / 255;
+
+            const leftBarHeight = Math.max(minBar, leftValue * maxBarHeight);
+            const rightBarHeight = Math.max(minBar, rightValue * maxBarHeight);
+
+            const leftX = leftStartX + i * (barWidth + barGap);
+            const rightX = rightStartX + (barsPerSide - 1 - i) * (barWidth + barGap);
+
+            visualizerCtx.fillRect(leftX, baseY - leftBarHeight, barWidth, leftBarHeight);
+            visualizerCtx.fillRect(rightX, baseY - rightBarHeight, barWidth, rightBarHeight);
+        }
+
+        visualizerAnimationId = requestAnimationFrame(drawVisualizer);
+    }
+
+    function ensureVisualizer() {
+        const globalAudio = getAudio();
+
+        if (!visualizerCanvas || !visualizerCtx || !globalAudio) return;
+
+        if (!audioContext) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return;
+            audioContext = new AudioCtx();
+        }
+
+        if (!sourceNode) {
+            sourceNode = audioContext.createMediaElementSource(globalAudio);
+        }
+
+        if (!channelSplitter) {
+            channelSplitter = audioContext.createChannelSplitter(2);
+        }
+
+        if (!leftAnalyser) {
+            leftAnalyser = audioContext.createAnalyser();
+            leftAnalyser.fftSize = 256;
+            leftAnalyser.smoothingTimeConstant = 0.64;
+        }
+
+        if (!rightAnalyser) {
+            rightAnalyser = audioContext.createAnalyser();
+            rightAnalyser.fftSize = 256;
+            rightAnalyser.smoothingTimeConstant = 0.64;
+        }
+
+        if (!mediaSource) {
+            mediaSource = sourceNode;
+            mediaSource.connect(channelSplitter);
+            mediaSource.connect(audioContext.destination);
+            channelSplitter.connect(leftAnalyser, 0);
+            channelSplitter.connect(rightAnalyser, 1);
+        }
+
+        resizeVisualizerCanvas();
+
+        if (!visualizerAnimationId) {
+            drawVisualizer();
+        }
+    }
+
+    window.ensureVisualizer = ensureVisualizer;
+
+    window.addEventListener('resize', resizeVisualizerCanvas);
+})();
+</script>

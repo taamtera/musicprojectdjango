@@ -6,10 +6,12 @@
         Chithara AI Music
     </a>
     <div class="space-x-4 flex items-center">
+        {% if user.is_authenticated %}
         <a href="{% url 'song-create' %}" class="hover:text-purple-400 transition-colors font-semibold">Generate
             Song</a>
         <a href="{% url 'song-list' %}" class="hover:text-purple-400 transition-colors">My Songs</a>
         <a href="{% url 'sharelink-list' %}" class="hover:text-purple-400 transition-colors">Shared With Me</a>
+        {% endif %}
 
         <div class="ml-4 pl-4 border-l border-slate-700 flex items-center space-x-4">
             {% if user.is_authenticated %}
@@ -45,6 +47,7 @@
                     </button>
                 </form>
                 <a href="{% url 'dev-login' %}"
+                    data-full-reload="true"
                     class="text-[10px] text-slate-500 hover:text-slate-300 text-center uppercase tracking-widest transition-colors">Developer
                     Bypass</a>
             </div>

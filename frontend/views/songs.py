@@ -1,17 +1,17 @@
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from backend.models import Song
+from .mixins import LandingLoginRequiredMixin
 import json
 import requests
 import time
 from django.conf import settings
 
-class SongListView(LoginRequiredMixin, ListView):
+class SongListView(LandingLoginRequiredMixin, ListView):
     model = Song
     template_name = 'songs/list.html'
 
@@ -63,7 +63,7 @@ class SongCallbackView(View):
             return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
 
-class SongCreateView(LoginRequiredMixin, CreateView):
+class SongCreateView(LandingLoginRequiredMixin, CreateView):
     model = Song
     fields = ['title', 'genre', 'description', 'generation_method']
     template_name = 'common/form.html'
@@ -152,7 +152,7 @@ class SongCreateView(LoginRequiredMixin, CreateView):
         context['title'] = 'Create Song'
         return context
 
-class SongUpdateView(LoginRequiredMixin, UpdateView):
+class SongUpdateView(LandingLoginRequiredMixin, UpdateView):
     model = Song
     fields = ['title', 'genre', 'description', 'gen_status', 'gen_status_result', 'audio_url', 'task_id']
     template_name = 'common/form.html'
@@ -163,7 +163,7 @@ class SongUpdateView(LoginRequiredMixin, UpdateView):
         context['title'] = 'Update Song'
         return context
 
-class SongDeleteView(LoginRequiredMixin, DeleteView):
+class SongDeleteView(LandingLoginRequiredMixin, DeleteView):
     model = Song
     template_name = 'common/confirm_delete.html'
     success_url = reverse_lazy('song-list')

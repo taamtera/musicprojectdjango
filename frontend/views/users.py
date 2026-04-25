@@ -1,13 +1,13 @@
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.contrib.auth.mixins import LoginRequiredMixin
 from backend.models import User
+from .mixins import LandingLoginRequiredMixin
 
-class UserListView(LoginRequiredMixin, ListView):
+class UserListView(LandingLoginRequiredMixin, ListView):
     model = User
     template_name = 'users/list.html'
 
-class UserCreateView(LoginRequiredMixin, CreateView):
+class UserCreateView(LandingLoginRequiredMixin, CreateView):
     model = User
     fields = ['username', 'email', 'name', 'is_staff']
     template_name = 'common/form.html'
@@ -18,7 +18,7 @@ class UserCreateView(LoginRequiredMixin, CreateView):
         context['title'] = 'Create User'
         return context
 
-class UserUpdateView(LoginRequiredMixin, UpdateView):
+class UserUpdateView(LandingLoginRequiredMixin, UpdateView):
     model = User
     fields = ['username', 'email', 'name', 'is_staff']
     template_name = 'common/form.html'
@@ -29,7 +29,7 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
         context['title'] = 'Update User'
         return context
 
-class UserDeleteView(LoginRequiredMixin, DeleteView):
+class UserDeleteView(LandingLoginRequiredMixin, DeleteView):
     model = User
     template_name = 'common/confirm_delete.html'
     success_url = reverse_lazy('user-list')

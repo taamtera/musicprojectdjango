@@ -1,9 +1,9 @@
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from django.contrib.auth.mixins import LoginRequiredMixin
 from backend.models import ShareLink
+from .mixins import LandingLoginRequiredMixin
 
-class ShareLinkListView(LoginRequiredMixin, ListView):
+class ShareLinkListView(LandingLoginRequiredMixin, ListView):
     model = ShareLink
     template_name = 'shares/list.html'
 
@@ -31,7 +31,7 @@ class ShareLinkListView(LoginRequiredMixin, ListView):
             
         return queryset
 
-class ShareLinkCreateView(LoginRequiredMixin, CreateView):
+class ShareLinkCreateView(LandingLoginRequiredMixin, CreateView):
     model = ShareLink
     fields = ['song', 'creator', 'email', 'can_view', 'can_download', 'can_share_forward']
     template_name = 'common/form.html'
@@ -42,7 +42,7 @@ class ShareLinkCreateView(LoginRequiredMixin, CreateView):
         context['title'] = 'Create Share Link'
         return context
 
-class ShareLinkUpdateView(LoginRequiredMixin, UpdateView):
+class ShareLinkUpdateView(LandingLoginRequiredMixin, UpdateView):
     model = ShareLink
     fields = ['song', 'creator', 'email', 'can_view', 'can_download', 'can_share_forward']
     template_name = 'common/form.html'
@@ -53,7 +53,7 @@ class ShareLinkUpdateView(LoginRequiredMixin, UpdateView):
         context['title'] = 'Update Share Link'
         return context
 
-class ShareLinkDeleteView(LoginRequiredMixin, DeleteView):
+class ShareLinkDeleteView(LandingLoginRequiredMixin, DeleteView):
     model = ShareLink
     template_name = 'common/confirm_delete.html'
     success_url = reverse_lazy('sharelink-list')

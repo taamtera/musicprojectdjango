@@ -39,7 +39,8 @@ def poll_songs_loop():
                             song.save()
                     elif song.task_id:
                         check_song_status(song)
-            
+            else:
+                print(f"\n[Background Task] Polling Cycle: No songs in progress")
         except Exception as e:
             print(f"[Background Task] Error in polling loop: {str(e)}")
             
@@ -54,6 +55,7 @@ def check_song_status(song):
         data = response.json()
 
         if response.status_code == 200 and data.get("code") == 200:
+            print(f"[Background Task] Checking {song.title}: API responded with status {data.get('data', {}).get('status')}")
             result_data = data.get("data", {})
             api_status = result_data.get("status")
             
@@ -73,7 +75,8 @@ def check_song_status(song):
                 print(f"[Background Task] FAILED: {song.title} ({api_status})")
             
             song.save()
-        
+        else:
+            print(f"[Background Task] Failed to check {song.title}: API error {response.status_code} - {data.get('message')}")
     except Exception as e:
         print(f"[Background Task] Error checking {song.title}: {str(e)}")
 

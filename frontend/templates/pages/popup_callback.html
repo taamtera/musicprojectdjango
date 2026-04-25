@@ -6,17 +6,21 @@
 <body>
     <p>Authentication successful. You can close this window.</p>
     <script>
+        const postLoginPath = '/songs/';
+
         if (window.opener && !window.opener.closed) {
-            var urlParams = new URLSearchParams(window.location.search);
-            var target = urlParams.get('target');
-            if (target) {
-                window.opener.location.href = target;
-            } else {
-                window.opener.location.reload();
-            }
-            window.close();
+            // Force a hard navigation so authenticated state is reflected immediately.
+            window.opener.location.replace(postLoginPath);
+            setTimeout(() => {
+                try {
+                    window.opener.location.reload();
+                } catch (e) {
+                    // Ignore reload failures; replace already navigated the opener.
+                }
+                window.close();
+            }, 100);
         } else {
-            window.location.href = '/';
+            window.location.replace(postLoginPath);
         }
     </script>
 </body>

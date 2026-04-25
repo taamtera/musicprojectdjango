@@ -102,6 +102,17 @@
         // Intercept all internal links
         document.addEventListener('click', e => {
             const link = e.target.closest('a');
+            if (!link) return;
+
+            const isAuthRoute =
+                link.pathname === '/dev-login/' ||
+                link.pathname.startsWith('/accounts/');
+            const forceFullReload = link.dataset.fullReload === 'true' || isAuthRoute;
+
+            if (forceFullReload) {
+                return;
+            }
+
             if (link && 
                 link.href && 
                 link.href.startsWith(window.location.origin) && 
