@@ -77,11 +77,11 @@ This project completely drops monolithic structures by separating logic into two
 flowchart LR
 
    %% View/Controller Layer
-   VB["Controller (views)<br/>base.py<br/>---<br/>index()<br/>popup_callback()<br/>dev_login()<br/>serve_audio()"]
-   VS["Controller (views)<br/>songs.py<br/>---<br/>SongListView.get_queryset()<br/>SongListView.render_to_response()<br/>SongCreateView.form_valid()<br/>SongCreateView._call_mock_api()<br/>SongCreateView._call_suno_api()<br/>SongUpdateView.form_valid()<br/>SongDeleteView.delete()<br/>SongCallbackView.post()"]
-   VU["Controller (views)<br/>users.py<br/>---<br/>UserListView.get_queryset()<br/>UserCreateView.form_valid()<br/>UserUpdateView.form_valid()<br/>UserDeleteView.delete()"]
-   VSH["Controller (views)<br/>shares.py<br/>---<br/>ShareLinkListView.get_queryset()<br/>ShareLinkCreateView.form_valid()<br/>ShareLinkUpdateView.form_valid()<br/>ShareLinkDeleteView.delete()"]
-   VP["Controller (management)<br/>poll_songs.py<br/>---<br/>handle()<br/>check_song_status()<br/>Polls every 30s<br/>Updates gen_status"]
+   VB["Controller (views)<br/>base.py<br/>---<br/>index(request)<br/>popup_callback(request)<br/>dev_login(request)<br/>serve_audio(request, filename)"]
+   VS["Controller (views)<br/>songs.py<br/>---<br/>SongListView.get_queryset(self)<br/>SongListView.render_to_response(self, context, **response_kwargs)<br/>SongCreateView.form_valid(self, form)<br/>SongCreateView._call_mock_api(self, song)<br/>SongCreateView._call_suno_api(self, song)<br/>SongCreateView.get_context_data(self, **kwargs)<br/>SongUpdateView (inherited form handling)<br/>SongCallbackView.post(self, request, token, *args, **kwargs)"]
+   VU["Controller (views)<br/>users.py<br/>---<br/>UserListView (inherited list dispatch)<br/>UserCreateView.get_context_data(self, **kwargs)<br/>UserUpdateView.get_context_data(self, **kwargs)<br/>UserDeleteView (inherited delete dispatch)"]
+   VSH["Controller (views)<br/>shares.py<br/>---<br/>ShareLinkListView.get_queryset(self)<br/>ShareLinkCreateView.get_context_data(self, **kwargs)<br/>ShareLinkUpdateView.get_context_data(self, **kwargs)<br/>ShareLinkDeleteView (inherited delete dispatch)"]
+   VP["Controller (management)<br/>poll_songs.py<br/>---<br/>Command.handle(self, *args, **options)<br/>Command.check_song_status(self, song)<br/>Command.download_and_save_audio(self, song, audio_url)<br/>Loop every 30s<br/>Updates gen_status"]
 
    %% Model Layer
    MU["Model user_model.py<br/>---<br/>username<br/>email<br/>name<br/>listens_to M2M"]
@@ -116,8 +116,7 @@ flowchart LR
 
    %% Template to views
    TINDEX --> VB 
-   TL --> VS 
-   TLP --> VS 
+   TL --> VS  
    TFORM <--> |Generate Song Form| VS 
    TFORM <--> |Login/Registration Form| VU 
    TFORM <--> |Share Link Form| VSH 
@@ -137,6 +136,48 @@ flowchart LR
    class MU,MS,MSL model;
    class TB,TP,TF,TL,TLP,TFORM,TINDEX template;
 ```
+
+## Song Generation Sequence
+
+```mermaid
+sequenceDiagram
+   participant Template as Template<br/>common/form.html
+   participant SongView as Controller<br/>SongCreateView.form_valid(form)
+    participant SongModel as Model<br/>Song
+    participant DB as Database
+   participant PollView as Controller<br/>poll_songs.Command.handle(self, *args, **options)
+    participant SunoAPI as Suno API
+
+   Template->>SongView: submit form<br/>(title, genre, description, generation_method)
+    activate SongView
+    SongView->>SongView: form_valid()
+   SongView->>SongView: _call_mock_api(song) / _call_suno_api(song)
+   SongView->>SongModel: set generated_by, task_id, gen_status
+   SongView->>DB: save()
+    deactivate SongView
+    DB->>DB: gen_status='in-progress'
+
+    loop Every 30s
+      PollView->>DB: Song.objects.filter(gen_status='in-progress', task_id__isnull=False)
+        DB-->>PollView: songs []
+        activate PollView
+        PollView->>PollView: check_song_status(song)
+      PollView->>SunoAPI: requests.get(...record-info?taskId=song.task_id)
+        SunoAPI-->>PollView: {status, audio_url}
+        PollView->>SongModel: song.gen_status_result = api_status
+      PollView->>PollView: download_and_save_audio(song, audio_url)
+      PollView->>SongModel: song.gen_status = 'done'<br/>song.audio_url = audio_url
+      PollView->>DB: song.save()
+        deactivate PollView
+        DB->>DB: gen_status='done'<br/>audio_url updated
+    end
+
+   SongView->>DB: SongListView.get_queryset(self)
+    DB-->>SongView: songs [updated]
+   SongView->>Template: render_to_response(context)
+    Template->>Template: Display song with<br/>status='done'<br/>and audio player
+```
+
 
 ## CRUD Operations
 
