@@ -8,6 +8,7 @@ features:
 - User Authentication via Google OAuth
 - Developer Bypass for instant login and testing (TA please use this one)
 - Polymorphic Song Generation with support for multiple APIs (currently Suno API) and MOCK mode for testing without API calls (set during song generation)
+- MOCK mode simulates in-progress processing with a 10-second delay before marking the song done
 - Song generation polled every 10 seconds to check for completion and log updates in terminal (check terminal for progress)
 - Pseudo random gredient for song based on id for unique visual
 - song player with real-time visualizer
@@ -197,10 +198,11 @@ sequenceDiagram
       SongView->>SongModel: set generated_by, task_id, gen_status='in-progress', audio_url=fixed link
       SongView->>DB: save()
       deactivate SongView
-      DB->>DB: gen_status='done'<br/>audio_url=fixed link
+      DB->>DB: gen_status='in-progress'<br/>audio_url=fixed link
 
       SongView->>TasksView: trigger single poll update
       activate TasksView
+      TasksView->>TasksView: wait 10 seconds
       TasksView->>SongModel: set gen_status='done'<br/>audio_url=fixed link
       TasksView->>DB: song.save()
       deactivate TasksView

@@ -34,6 +34,8 @@ def poll_songs_loop():
                     if song.generation_method == 'mock':
                         print(f"[Background Task] Mock Mode: Downloading {song.title} from mock URL...")
                         if song.audio_url:
+                            print(f"[Background Task] Mock Mode: waiting 10 seconds before completing {song.title}...")
+                            time.sleep(10)
                             download_and_save_audio(song, song.audio_url)
                             song.gen_status = 'done'
                             song.save()
