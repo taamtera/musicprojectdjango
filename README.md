@@ -99,10 +99,7 @@ flowchart LR
    TINDEX["Template pages/index.html"]
 
    %% Route to templates
-   U --> VB
-   U --> VS
-   U --> VU
-   U --> VSH
+   U --> TB,TP,TF,TL,TLP,TFORM,TINDEX
 
    %% View to models
    VS --> MS
