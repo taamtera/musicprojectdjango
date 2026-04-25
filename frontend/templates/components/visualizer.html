@@ -37,12 +37,10 @@
         const width = visualizerCanvas.width;
         const height = visualizerCanvas.height;
         const barGap = 2;
-        const sideWidth = 0
         const barWidth = 10;
-        const barsPerSide = width / 2 / (barWidth + barGap);
+        const barsPerSide = width / 2 / (barWidth + barGap) - 1;
         const totalBarsWidth = barsPerSide * barWidth + (barsPerSide - 1) * barGap;
-        const verticalPadding = 10;
-        const baseY = height - verticalPadding;
+        const baseY = height;
 
         const leftData = new Uint8Array(leftAnalyser.frequencyBinCount);
         const rightData = new Uint8Array(rightAnalyser.frequencyBinCount);
@@ -58,16 +56,32 @@
         gradient.addColorStop(1, 'rgba(15, 23, 42, 0.08)');
         visualizerCtx.fillStyle = gradient;
 
-        const leftStep = Math.max(1, Math.floor(leftData.length / barsPerSide));
-        const rightStep = Math.max(1, Math.floor(rightData.length / barsPerSide));
+        function freqToIndex(freq, analyser) {
+            const nyquist = audioContext.sampleRate / 2;
+            return Math.round((freq / nyquist) * analyser.frequencyBinCount);
+        }
+
+        const minFreq = 10;
+        const maxFreq = 18000; // lower this to cut more highs, e.g. 4000
+
+        const minIndex = freqToIndex(minFreq, leftAnalyser);
+        const maxIndex = freqToIndex(maxFreq, leftAnalyser);
+
+        const indexRange = Math.max(1, maxIndex - minIndex);
+        const step = indexRange / barsPerSide;
         const minBar = globalAudio.paused ? 3 : 5;
         const maxBarHeight = height * 0.78;
         const leftStartX = 10;
         const rightStartX = width - 10 - totalBarsWidth;
 
         for (let i = 0; i < barsPerSide; i++) {
-            const leftValue = leftData[i * leftStep] / 255;
-            const rightValue = rightData[i * rightStep] / 255;
+            const dataIndex = Math.min(
+                leftData.length - 1,
+                Math.floor(minIndex + i * step)
+            );
+
+            let leftValue = leftData[dataIndex] / 255;
+            let rightValue = rightData[dataIndex] / 255;
 
             const leftBarHeight = Math.max(minBar, leftValue * maxBarHeight);
             const rightBarHeight = Math.max(minBar, rightValue * maxBarHeight);
@@ -103,14 +117,16 @@
 
         if (!leftAnalyser) {
             leftAnalyser = audioContext.createAnalyser();
-            leftAnalyser.fftSize = 256;
-            leftAnalyser.smoothingTimeConstant = 0.64;
+            leftAnalyser.fftSize = 16384;
+            leftAnalyser.smoothingTimeConstant = 0.62;
+            leftAnalyser.maxDecibels = -40;
         }
 
         if (!rightAnalyser) {
             rightAnalyser = audioContext.createAnalyser();
-            rightAnalyser.fftSize = 256;
-            rightAnalyser.smoothingTimeConstant = 0.64;
+            rightAnalyser.fftSize = 16384;
+            rightAnalyser.smoothingTimeConstant = 0.62;
+            rightAnalyser.maxDecibels = -40;
         }
 
         if (!mediaSource) {
