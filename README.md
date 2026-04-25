@@ -184,6 +184,7 @@ sequenceDiagram
    sequenceDiagram
       participant Template as Template<br/>common/form.html
       participant SongView as Controller<br/>SongCreateView.form_valid(form)
+      participant PollView as Controller<br/>poll_songs.Command.check_song_status(song)
       participant SongModel as Model<br/>Song
       participant DB as Database
 
@@ -195,6 +196,12 @@ sequenceDiagram
       SongView->>DB: save()
       deactivate SongView
       DB->>DB: gen_status='done'<br/>audio_url=fixed link
+
+      SongView->>PollView: trigger single poll update
+      activate PollView
+      PollView->>SongModel: set gen_status='done'<br/>audio_url=fixed link
+      PollView->>DB: song.save()
+      deactivate PollView
 
       SongView->>DB: SongListView.get_queryset(self)
       DB-->>SongView: songs [updated]
