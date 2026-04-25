@@ -148,7 +148,7 @@ flowchart LR
 
    %% Color coding: M / V / T (+ routes)
    classDef route fill:#1f2937,stroke:#9ca3af,color:#f9fafb,stroke-width:1px;
-   classDef view fill:#1d4ed8,stroke:#93c5fd,color:#eff6ff,stroke-width:1px;'
+   classDef view fill:#1d4ed8,stroke:#93c5fd,color:#eff6ff,stroke-width:1px;
    classDef task fill:#7e22ce,stroke:#c4b5fd,color:#f3e8ff,stroke-width:1px;
    classDef model fill:#166534,stroke:#86efac,color:#f0fdf4,stroke-width:1px;
    classDef template fill:#7c2d12,stroke:#fdba74,color:#fff7ed,stroke-width:1px;
@@ -163,12 +163,22 @@ flowchart LR
 
 ```mermaid
 sequenceDiagram
-   participant Template as Template<br/>common/form.html
-   participant SongView as Controller<br/>SongCreateView.form_valid(form)
-    participant SongModel as Model<br/>Song
-    participant DB as Database
-   participant TasksView as Controller<br/>poll_songs.Command.handle(self, *args, **options)
-    participant SunoAPI as Suno API
+   box rgba(124,45,18,0.15) Template Layer
+      participant Template as Template<br/>common/form.html
+   end
+   box rgba(29,78,216,0.15) View Layer
+      participant SongView as View<br/>SongCreateView.form_valid(form)
+   end
+   box rgba(126,34,206,0.15) Task Layer
+      participant TasksView as View<br/>poll_songs.Command.handle(self, *args, **options)
+   end
+   box rgba(22,101,52,0.15) Model Layer
+      participant SongModel as Model<br/>Song
+   end
+   box rgba(31,41,55,0.15) Infrastructure Layer
+      participant DB as Database
+      participant SunoAPI as Suno API
+   end
 
    Template->>SongView: submit form<br/>(title, genre, description, generation_method)
     activate SongView
@@ -204,11 +214,21 @@ sequenceDiagram
 
    ```mermaid
    sequenceDiagram
-      participant Template as Template<br/>common/form.html
-      participant SongView as Controller<br/>SongCreateView.form_valid(form)
-      participant TasksView as Controller<br/>poll_songs.Command.check_song_status(song)
-      participant SongModel as Model<br/>Song
-      participant DB as Database
+      box rgba(124,45,18,0.15) Template Layer
+         participant Template as Template<br/>common/form.html
+      end
+      box rgba(29,78,216,0.15) View Layer
+         participant SongView as View<br/>SongCreateView.form_valid(form)
+      end
+      box rgba(126,34,206,0.15) Task Layer
+         participant TasksView as View<br/>poll_songs.Command.check_song_status(song)
+      end
+      box rgba(22,101,52,0.15) Model Layer
+         participant SongModel as Model<br/>Song
+      end
+      box rgba(31,41,55,0.15) Infrastructure Layer
+         participant DB as Database
+      end
 
       Template->>SongView: submit form<br/>(title, genre, description, generation_method='mock')
       activate SongView
