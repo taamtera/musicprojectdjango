@@ -9,6 +9,7 @@ features:
 - Developer Bypass for instant login and testing (TA please use this one)
 - Polymorphic Song Generation with support for multiple APIs (currently Suno API) and MOCK mode for testing without API calls (set during song generation)
 - Song generation polled every 10 seconds to check for completion and log updates in terminal (check terminal for progress)
+- Pseudo random gredient for song based on id for unique visual
 - song player with real-time visualizer
 - CRUD operations for songs with dynamic search and sorting capabilities
 - 
@@ -69,6 +70,84 @@ This project completely drops monolithic structures by separating logic into two
 - **`User`**: Base profile extending the custom user matrix. Holds many-to-many relationship mappings to track a `listens_to` history. Replaces the older separate Artist/Enjoyer paradigms so anyone can act as a creator.
 - **`Song`**: The core data object tied directly to the `User` framework who generated it. Includes metadata like tags, genre, description, and status.
 - **`ShareLink`**: External links carrying specific user permissions (view, download, share forward) for shared interactions.
+
+## MVC / MVT Diagram
+
+```mermaid
+flowchart LR
+   %% Route Layer
+   U[frontend/urls.py]\nRoutes
+
+   %% View/Controller Layer
+   VB[views/base.py\nindex, popup_callback, dev_login, serve_audio]
+   VS[views/songs.py\nSongList/Create/Update/Delete\nSongCallback]
+   VU[views/users.py\nUser CRUD Views]
+   VSH[views/shares.py\nShareLink CRUD Views]
+
+   %% Model Layer
+   MU[backend/models/user_model.py\nUser]
+   MS[backend/models/song_model.py\nSong]
+   MSL[backend/models/share_model.py\nShareLink]
+
+   %% Template Layer
+   TB[templates/base.html\nLayout + SPA navigation]
+   TP[templates/components/player.html\nGlobal audio player]
+   TF[templates/components/filter_sort.html\nSearch/Sort AJAX]
+   TL[templates/songs/list.html]
+   TLP[templates/songs/partials/song_list.html]
+   TFORM[templates/common/form.html]
+   TCONF[templates/common/confirm_delete.html]
+   TINDEX[templates/pages/index.html]
+   TPOP[templates/pages/popup_callback.html]
+
+   %% Route to views
+   U --> VB
+   U --> VS
+   U --> VU
+   U --> VSH
+
+   %% View to models
+   VS --> MS
+   VS --> MU
+   VU --> MU
+   VSH --> MSL
+   VSH --> MU
+   VSH --> MS
+
+   %% Model relations
+   MU -->|listens_to M2M| MS
+   MS -->|generated_by FK| MU
+   MSL -->|song FK| MS
+   MSL -->|creator FK| MU
+
+   %% View to templates
+   VB --> TINDEX
+   VB --> TPOP
+   VS --> TL
+   VS --> TLP
+   VS --> TFORM
+   VS --> TCONF
+   VU --> TFORM
+   VU --> TCONF
+   VSH --> TFORM
+   VSH --> TCONF
+
+   %% Template composition
+   TL --> TF
+   TL --> TLP
+   TB --> TP
+
+   %% Color coding: M / V / T (+ routes)
+   classDef route fill:#1f2937,stroke:#9ca3af,color:#f9fafb,stroke-width:1px;
+   classDef view fill:#1d4ed8,stroke:#93c5fd,color:#eff6ff,stroke-width:1px;
+   classDef model fill:#166534,stroke:#86efac,color:#f0fdf4,stroke-width:1px;
+   classDef template fill:#7c2d12,stroke:#fdba74,color:#fff7ed,stroke-width:1px;
+
+   class U route;
+   class VB,VS,VU,VSH view;
+   class MU,MS,MSL model;
+   class TB,TP,TF,TL,TLP,TFORM,TCONF,TINDEX,TPOP template;
+```
 
 ## CRUD Operations
 

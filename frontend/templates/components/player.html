@@ -47,8 +47,8 @@
 
     <!-- Branding -->
     <div class="w-24 shrink-0 text-right">
-        <p id="branding-title" class="text-[10px] font-bold text-slate-500">CHITHARA AI</p>
-        <p class="text-[8px] text-slate-600 uppercase">© 2026 Generator</p>
+        <p id="branding-title" class="text-[10px] font-bold text-slate-500">By taamtera</p>
+        <p class="text-[8px] text-slate-600 uppercase">© 2026 </p>
     </div>
     </div>
 
@@ -70,6 +70,16 @@ const volumeSlider = document.getElementById('volume-slider');
 
 let isSeeking = false;
 let audioContext = null;
+
+function applyPlayerIconGradient(seed) {
+    playerIcon.className = "w-10 h-10 rounded-lg flex items-center justify-center text-white shadow-lg pulse-ring";
+
+    if (seed && typeof buildSeededGradient === 'function') {
+        playerIcon.style.background = buildSeededGradient(seed);
+    } else {
+        playerIcon.style.background = 'linear-gradient(135deg, rgba(168, 85, 247, 0.9) 0%, rgba(59, 130, 246, 0.9) 100%)';
+    }
+}
 
 function formatTime(seconds) {
     if (!seconds || isNaN(seconds)) return '0:00';
@@ -139,7 +149,9 @@ function playSong(url, title, genre, cardId) {
     playerTitle.classList.replace('text-slate-500', 'text-white');
     playerGenre.classList.replace('text-slate-600', 'text-slate-400');
 
-    playerIcon.className = "w-10 h-10 rounded-lg flex items-center justify-center text-white shadow-lg bg-gradient-to-br from-purple-500 to-blue-500 pulse-ring";
+    const activeCard = document.getElementById(cardId);
+    const seed = activeCard ? activeCard.dataset.songSeed : null;
+    applyPlayerIconGradient(seed);
 
     brandingTitle.classList.replace('text-slate-500', 'text-purple-400');
 
@@ -149,7 +161,6 @@ function playSong(url, title, genre, cardId) {
     document.querySelectorAll('.song-card')
         .forEach(c => c.classList.remove('border-purple-500', 'bg-purple-900/10'));
 
-    const activeCard = document.getElementById(cardId);
     if (activeCard) {
         activeCard.classList.add('border-purple-500', 'bg-purple-900/10');
     }
