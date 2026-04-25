@@ -75,8 +75,6 @@ This project completely drops monolithic structures by separating logic into two
 
 ```mermaid
 flowchart LR
-   %% Route Layer
-   U["frontend/urls.py<br/>Routes"]
 
    %% View/Controller Layer
    VB["Controller (views)<br/>base.py<br/>---<br/>index()<br/>popup_callback()<br/>dev_login()<br/>serve_audio()"]
@@ -98,15 +96,6 @@ flowchart LR
    TLP["Template songs/partials/song_list.html"]
    TFORM["Template common/form.html"]
    TINDEX["Template pages/index.html"]
-
-   %% Route to templates
-   U --> TB
-   U --> TP
-   U --> TF
-   U --> TL
-   U --> TLP
-   U --> TFORM
-   U --> TINDEX
 
    %% View to models
    VS --> MS
@@ -144,8 +133,7 @@ flowchart LR
    classDef model fill:#166534,stroke:#86efac,color:#f0fdf4,stroke-width:1px;
    classDef template fill:#7c2d12,stroke:#fdba74,color:#fff7ed,stroke-width:1px;
 
-   class U route;
-   class VB,VS,VU,VSH,VP view;
+   class VB,VS,VU,VSH view;
    class MU,MS,MSL model;
    class TB,TP,TF,TL,TLP,TFORM,TINDEX template;
 ```
