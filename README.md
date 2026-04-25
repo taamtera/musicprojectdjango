@@ -79,10 +79,10 @@ flowchart LR
    U["frontend/urls.py<br/>Routes"]
 
    %% View/Controller Layer
-   VB["views/base.py<br/>index, popup_callback, dev_login, serve_audio"]
-   VS["views/songs.py<br/>SongList/Create/Update/Delete<br/>SongCallback"]
-   VU["views/users.py<br/>User CRUD Views"]
-   VSH["views/shares.py<br/>ShareLink CRUD Views"]
+   VB["views/base.py (Controller)<br/>index()<br/>popup_callback()<br/>dev_login()<br/>serve_audio()"]
+   VS["views/songs.py (Controller)<br/>SongListView.get_queryset()<br/>SongListView.render_to_response()<br/>SongCreateView.form_valid()<br/>SongCreateView._call_mock_api()<br/>SongCreateView._call_suno_api()<br/>SongUpdateView (CRUD: update)<br/>SongDeleteView (CRUD: delete)<br/>SongCallbackView.post()"]
+   VU["views/users.py (Controller)<br/>UserListView (CRUD: read)<br/>UserCreateView (CRUD: create)<br/>UserUpdateView (CRUD: update)<br/>UserDeleteView (CRUD: delete)"]
+   VSH["views/shares.py (Controller)<br/>ShareLinkListView.get_queryset()<br/>ShareLinkCreateView (CRUD: create)<br/>ShareLinkUpdateView (CRUD: update)<br/>ShareLinkDeleteView (CRUD: delete)"]
 
    %% Model Layer
    MU["backend/models/user_model.py<br/>User"]
