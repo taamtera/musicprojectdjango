@@ -51,7 +51,7 @@ TODO:
    ```bash
    python manage.py runserver
    ```
-8. **Google OAuth Setup** (For official production login):
+8. **Google OAuth Setup** (❗OPTIONAL USE DEVELOPER BYPASS FOR TA TESTING❗):
    - Go to [Google Cloud Console](https://console.cloud.google.com/) → APIs & Services → Credentials → Create OAuth 2.0 Client ID (Web application).
    - Under **Authorized redirect URIs**, add exactly: `http://127.0.0.1:8000/accounts/google/login/callback/`
    - Copy the `client_id` and `secret` into `config/settings.py` under `SOCIALACCOUNT_PROVIDERS`.
