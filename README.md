@@ -76,12 +76,12 @@ This project completely drops monolithic structures by separating logic into two
 ```mermaid
 flowchart LR
 
-   %% View/Controller Layer
-   VB["Controller (views)<br/>base.py<br/>---<br/>index(request)<br/>popup_callback(request)<br/>dev_login(request)<br/>serve_audio(request, filename)"]
-   VS["Controller (views)<br/>songs.py<br/>---<br/>SongListView.get_queryset(self)<br/>SongListView.render_to_response(self, context, **response_kwargs)<br/>SongCreateView.form_valid(self, form)<br/>SongCreateView._call_mock_api(self, song)<br/>SongCreateView._call_suno_api(self, song)<br/>SongCreateView.get_context_data(self, **kwargs)<br/>SongUpdateView (inherited form handling)<br/>SongCallbackView.post(self, request, token, *args, **kwargs)"]
-   VU["Controller (views)<br/>users.py<br/>---<br/>UserListView (inherited list dispatch)<br/>UserCreateView.get_context_data(self, **kwargs)<br/>UserUpdateView.get_context_data(self, **kwargs)<br/>UserDeleteView (inherited delete dispatch)"]
-   VSH["Controller (views)<br/>shares.py<br/>---<br/>ShareLinkListView.get_queryset(self)<br/>ShareLinkCreateView.get_context_data(self, **kwargs)<br/>ShareLinkUpdateView.get_context_data(self, **kwargs)<br/>ShareLinkDeleteView (inherited delete dispatch)"]
-   VP["Controller (polls song status)<br/>tasks.py<br/>---<br/>Command.handle(self, *args, **options)<br/>Command.check_song_status(self, song)<br/>Command.download_and_save_audio(self, song, audio_url)<br/>Loop every 30s<br/>Updates gen_status"]
+   %% View/View Layer
+   VB["View (Base and Auth Controller)<br/>base.py<br/>---<br/>index(request)<br/>popup_callback(request)<br/>dev_login(request)<br/>serve_audio(request, filename)"]
+   VS["View (song Controller)<br/>songs.py<br/>---<br/>SongListView.get_queryset(self)<br/>SongListView.render_to_response(self, context, **response_kwargs)<br/>SongCreateView.form_valid(self, form)<br/>SongCreateView._call_mock_api(self, song)<br/>SongCreateView._call_suno_api(self, song)<br/>SongCreateView.get_context_data(self, **kwargs)<br/>SongUpdateView (inherited form handling)<br/>SongCallbackView.post(self, request, token, *args, **kwargs)"]
+   VU["View (User Controller)<br/>users.py<br/>---<br/>UserListView (inherited list dispatch)<br/>UserCreateView.get_context_data(self, **kwargs)<br/>UserUpdateView.get_context_data(self, **kwargs)<br/>UserDeleteView (inherited delete dispatch)"]
+   VSH["View (Share Link Controller)<br/>shares.py<br/>---<br/>ShareLinkListView.get_queryset(self)<br/>ShareLinkCreateView.get_context_data(self, **kwargs)<br/>ShareLinkUpdateView.get_context_data(self, **kwargs)<br/>ShareLinkDeleteView (inherited delete dispatch)"]
+   VP["View (polls song status Controller)<br/>tasks.py<br/>---<br/>Command.handle(self, *args, **options)<br/>Command.check_song_status(self, song)<br/>Command.download_and_save_audio(self, song, audio_url)<br/>Loop every 30s<br/>Updates gen_status"]
 
    %% Model Layer
    MU["Model user_model.py<br/>---<br/>username<br/>email<br/>name<br/>listens_to M2M"]
@@ -98,6 +98,7 @@ flowchart LR
    TINDEX["Template pages/index.html"]
 
    %% View to models
+   VB --> MU
    VS --> MS
    VS --> MU
    VU --> MU
@@ -116,7 +117,7 @@ flowchart LR
 
    %% Template to views
    TINDEX --> VB 
-   TL --> VS  
+   TB --> VS  
    TFORM <--> |Generate Song Form| VS 
    TFORM <--> |Login/Registration Form| VU 
    TFORM <--> |Share Link Form| VSH 
@@ -125,6 +126,7 @@ flowchart LR
    TF --> TL
    TLP --> TL
    TP --> TB
+   TL --> TB  
 
    %% Color coding: M / V / T (+ routes)
    classDef route fill:#1f2937,stroke:#9ca3af,color:#f9fafb,stroke-width:1px;
