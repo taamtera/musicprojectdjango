@@ -1,3 +1,5 @@
+
+![](images/img5.png)
 ## Introduction
 
 Chithara AI Music Generator is a web application that allows users to generate, manage, and play AI-created music tracks. It supports both real API-based generation (Suno) and a mock mode for fast testing, enabling a smooth development and demonstration experience. Users can build a personal music library, search and sort songs dynamically, and play tracks with a real-time visualizer, all within a responsive and modern interface.
