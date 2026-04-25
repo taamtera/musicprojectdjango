@@ -82,7 +82,7 @@ flowchart LR
    VS["View (song Controller)<br/>songs.py<br/>---<br/>SongListView.get_queryset(self)<br/>SongListView.render_to_response(self, context, **response_kwargs)<br/>SongCreateView.form_valid(self, form)<br/>SongCreateView._call_mock_api(self, song)<br/>SongCreateView._call_suno_api(self, song)<br/>SongCreateView.get_context_data(self, **kwargs)<br/>SongUpdateView (inherited form handling)<br/>SongCallbackView.post(self, request, token, *args, **kwargs)"]
    VU["View (User Controller)<br/>users.py<br/>---<br/>UserListView (inherited list dispatch)<br/>UserCreateView.get_context_data(self, **kwargs)<br/>UserUpdateView.get_context_data(self, **kwargs)<br/>UserDeleteView (inherited delete dispatch)"]
    VSH["View (Share Link Controller)<br/>shares.py<br/>---<br/>ShareLinkListView.get_queryset(self)<br/>ShareLinkCreateView.get_context_data(self, **kwargs)<br/>ShareLinkUpdateView.get_context_data(self, **kwargs)<br/>ShareLinkDeleteView (inherited delete dispatch)"]
-   VP["View (polls song status Controller)<br/>tasks.py<br/>---<br/>Command.handle(self, *args, **options)<br/>Command.check_song_status(self, song)<br/>Command.download_and_save_audio(self, song, audio_url)<br/>Loop every 30s<br/>Updates gen_status"]
+   VT["View (polls song status Controller)<br/>tasks.py<br/>---<br/>Command.handle(self, *args, **options)<br/>Command.check_song_status(self, song)<br/>Command.download_and_save_audio(self, song, audio_url)<br/>Loop every 30s<br/>Updates gen_status"]
 
    %% Model Layer
    MU["Model user_model.py<br/>---<br/>username<br/>email<br/>name<br/>listens_to M2M"]
@@ -106,9 +106,9 @@ flowchart LR
    VSH --> MSL
    VSH --> MU
    VSH --> MS
-   VP -->|Query in-progress songs| MS
-   VP -->|Update gen_status| MS
-   VP -->|Polls every 30s| VP
+   VT -->|Query in-progress songs| MS
+   VT -->|Update gen_status| MS
+   VT -->|Polls every 30s| VT
 
    %% Model relations
    MU -->|listens_to M2M| MS
@@ -131,13 +131,15 @@ flowchart LR
 
    %% Color coding: M / V / T (+ routes)
    classDef route fill:#1f2937,stroke:#9ca3af,color:#f9fafb,stroke-width:1px;
-   classDef view fill:#1d4ed8,stroke:#93c5fd,color:#eff6ff,stroke-width:1px;
+   classDef view fill:#1d4ed8,stroke:#93c5fd,color:#eff6ff,stroke-width:1px;'
+   classDef task fill:#7e22ce,stroke:#c4b5fd,color:#f3e8ff,stroke-width:1px;
    classDef model fill:#166534,stroke:#86efac,color:#f0fdf4,stroke-width:1px;
    classDef template fill:#7c2d12,stroke:#fdba74,color:#fff7ed,stroke-width:1px;
 
    class VB,VS,VU,VSH view;
    class MU,MS,MSL model;
    class TB,TP,TF,TL,TLP,TFORM,TINDEX template;
+   class VT task;
 ```
 
 ## Song Generation Sequence
