@@ -1,0 +1,32 @@
+{% load socialaccount %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logging in… | Chithara AI Music</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center">
+    <div class="text-center">
+        <div class="animate-spin w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+        <p class="text-slate-400 text-sm">Redirecting to Google…</p>
+    </div>
+
+    {# Auto-submit straight to Google OAuth, preserving the ?next= redirect #}
+    <form id="google-login-form" method="POST" action="{% provider_login_url 'google' %}">
+        {% csrf_token %}
+        {% if request.GET.next %}
+            <input type="hidden" name="next" value="{{ request.GET.next }}">
+        {% endif %}
+    </form>
+
+    <script>
+        document.getElementById('google-login-form').submit();
+    </script>
+</body>
+</html>
