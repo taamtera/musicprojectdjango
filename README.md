@@ -81,7 +81,7 @@ flowchart LR
    VS["Controller (views)<br/>songs.py<br/>---<br/>SongListView.get_queryset(self)<br/>SongListView.render_to_response(self, context, **response_kwargs)<br/>SongCreateView.form_valid(self, form)<br/>SongCreateView._call_mock_api(self, song)<br/>SongCreateView._call_suno_api(self, song)<br/>SongCreateView.get_context_data(self, **kwargs)<br/>SongUpdateView (inherited form handling)<br/>SongCallbackView.post(self, request, token, *args, **kwargs)"]
    VU["Controller (views)<br/>users.py<br/>---<br/>UserListView (inherited list dispatch)<br/>UserCreateView.get_context_data(self, **kwargs)<br/>UserUpdateView.get_context_data(self, **kwargs)<br/>UserDeleteView (inherited delete dispatch)"]
    VSH["Controller (views)<br/>shares.py<br/>---<br/>ShareLinkListView.get_queryset(self)<br/>ShareLinkCreateView.get_context_data(self, **kwargs)<br/>ShareLinkUpdateView.get_context_data(self, **kwargs)<br/>ShareLinkDeleteView (inherited delete dispatch)"]
-   VP["Controller (management)<br/>poll_songs.py<br/>---<br/>Command.handle(self, *args, **options)<br/>Command.check_song_status(self, song)<br/>Command.download_and_save_audio(self, song, audio_url)<br/>Loop every 30s<br/>Updates gen_status"]
+   VP["Controller (polls song status)<br/>tasks.py<br/>---<br/>Command.handle(self, *args, **options)<br/>Command.check_song_status(self, song)<br/>Command.download_and_save_audio(self, song, audio_url)<br/>Loop every 30s<br/>Updates gen_status"]
 
    %% Model Layer
    MU["Model user_model.py<br/>---<br/>username<br/>email<br/>name<br/>listens_to M2M"]
@@ -145,7 +145,7 @@ sequenceDiagram
    participant SongView as Controller<br/>SongCreateView.form_valid(form)
     participant SongModel as Model<br/>Song
     participant DB as Database
-   participant PollView as Controller<br/>poll_songs.Command.handle(self, *args, **options)
+   participant TasksView as Controller<br/>poll_songs.Command.handle(self, *args, **options)
     participant SunoAPI as Suno API
 
    Template->>SongView: submit form<br/>(title, genre, description, generation_method)
@@ -158,17 +158,17 @@ sequenceDiagram
     DB->>DB: gen_status='in-progress'
 
     loop Every 30s
-      PollView->>DB: Song.objects.filter(gen_status='in-progress', task_id__isnull=False)
-        DB-->>PollView: songs []
-        activate PollView
-        PollView->>PollView: check_song_status(song)
-      PollView->>SunoAPI: requests.get(...record-info?taskId=song.task_id)
-        SunoAPI-->>PollView: {status, audio_url}
-        PollView->>SongModel: song.gen_status_result = api_status
-      PollView->>PollView: download_and_save_audio(song, audio_url)
-      PollView->>SongModel: song.gen_status = 'done'<br/>song.audio_url = audio_url
-      PollView->>DB: song.save()
-        deactivate PollView
+      TasksView->>DB: Song.objects.filter(gen_status='in-progress', task_id__isnull=False)
+        DB-->>TasksView: songs []
+        activate TasksView
+        TasksView->>TasksView: check_song_status(song)
+      TasksView->>SunoAPI: requests.get(...record-info?taskId=song.task_id)
+        SunoAPI-->>TasksView: {status, audio_url}
+        TasksView->>SongModel: song.gen_status_result = api_status
+      TasksView->>TasksView: download_and_save_audio(song, audio_url)
+      TasksView->>SongModel: song.gen_status = 'done'<br/>song.audio_url = audio_url
+      TasksView->>DB: song.save()
+        deactivate TasksView
         DB->>DB: gen_status='done'<br/>audio_url updated
     end
 
@@ -184,7 +184,7 @@ sequenceDiagram
    sequenceDiagram
       participant Template as Template<br/>common/form.html
       participant SongView as Controller<br/>SongCreateView.form_valid(form)
-      participant PollView as Controller<br/>poll_songs.Command.check_song_status(song)
+      participant TasksView as Controller<br/>poll_songs.Command.check_song_status(song)
       participant SongModel as Model<br/>Song
       participant DB as Database
 
@@ -197,11 +197,11 @@ sequenceDiagram
       deactivate SongView
       DB->>DB: gen_status='done'<br/>audio_url=fixed link
 
-      SongView->>PollView: trigger single poll update
-      activate PollView
-      PollView->>SongModel: set gen_status='done'<br/>audio_url=fixed link
-      PollView->>DB: song.save()
-      deactivate PollView
+      SongView->>TasksView: trigger single poll update
+      activate TasksView
+      TasksView->>SongModel: set gen_status='done'<br/>audio_url=fixed link
+      TasksView->>DB: song.save()
+      deactivate TasksView
 
       SongView->>DB: SongListView.get_queryset(self)
       DB-->>SongView: songs [updated]
