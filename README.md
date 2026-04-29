@@ -22,7 +22,7 @@ TODO:
 ### Prerequisites
 - Python 3.10+
 - Django 5.2 (LTS)
-- MongoDB Database (running locally at `localhost:27017` or configured in settings)
+- MongoDB Database (Default: `localhost:27017` no credentials or configured in config/settings.py)
 
 ### Quickstart Guide
 1. Clone or download the repository and navigate to the root directory.
